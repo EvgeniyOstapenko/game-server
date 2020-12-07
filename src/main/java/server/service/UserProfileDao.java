@@ -29,7 +29,7 @@ public class UserProfileDao implements UserProfileRegistry {
 
     @Override
     public IUser createNewUserProfile(String uid) {
-        Integer nextUserProfileId = namedParameterJdbcTemplate.queryForObject("select NEXT VALUE FOR user_profile_sequence", Collections.emptyMap(), Integer.class);
+        Integer nextUserProfileId = namedParameterJdbcTemplate.queryForObject("SELECT nextval('user_profile_sequence')", Collections.emptyMap(), Integer.class);
 
         namedParameterJdbcTemplate.update(
                 "insert into uid_profile (uid, profile_id) values (:uid, :profile_id)",
