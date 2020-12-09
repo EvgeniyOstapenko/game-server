@@ -25,13 +25,9 @@
         </entry>
     </util:map>
 
-<!--    <util:properties id="emptyValue" value-type="java.lang.String">-->
-<!--        <prop key="'sdfsdfs"/>-->
-<!--    </util:properties>-->
 
-    <util:properties id="emptyValue" value-type="java.lang.Character">
-        <prop key="1"/>
-    </util:properties>
+    <bean id="empty" class="java.lang.String">
+    </bean>
 
     <util:list id="emptyBackpackList" value-type="server.domain.BackpackItem">
     </util:list>

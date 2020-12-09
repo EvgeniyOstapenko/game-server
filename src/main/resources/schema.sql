@@ -9,7 +9,7 @@ CREATE TABLE user_profile
     energy     INT         NOT NULL,
     rating     INT         NOT NULL,
     money      INT         NOT NULL,
-    backpack   VARCHAR     NOT NULL DEFAULT '',
+    backpack   VARCHAR     NOT NULL,
     inventory  VARCHAR     NOT NULL DEFAULT '',
     friends    VARCHAR     NOT NULL DEFAULT ''
 );

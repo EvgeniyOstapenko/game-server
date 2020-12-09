@@ -2,6 +2,7 @@ package server.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,9 @@ public class UserProfileDao implements UserProfileRegistry {
     @Resource
     private UserProfile userProfile;
 
+    @Value("#{empty}")
+    private String emptyCollection;
+
     @Override
     public IUser createNewUserProfile(String uid) {
         Integer nextUserProfileId = namedParameterJdbcTemplate.queryForObject("SELECT nextval('user_profile_sequence')", Collections.emptyMap(), Integer.class);
@@ -42,8 +46,8 @@ public class UserProfileDao implements UserProfileRegistry {
                 )
         );
         namedParameterJdbcTemplate.update(
-                "insert into user_profile (id, name, level, experience, energy, rating, money)" +
-                        " values (:profile_id, :name, :level, :experience, :energy, :rating, :money)",
+                "insert into user_profile (id, name, level, experience, energy, rating, money, backpack, inventory, friends)" +
+                        " values (:profile_id, :name, :level, :experience, :energy, :rating, :money, :backpack, :inventory, :friends)",
                 Map.of(
                         "profile_id", nextUserProfileId,
                         "name", userProfile.getName(),
@@ -51,10 +55,10 @@ public class UserProfileDao implements UserProfileRegistry {
                         "experience", userProfile.getExperience(),
                         "energy", userProfile.getEnergy(),
                         "rating", userProfile.getRating(),
-                        "money", userProfile.getMoney()
-//                        "backpack", userProfile.getBackpack(),
-//                        "inventory", userProfile.getInventory(),
-//                        "friends", userProfile.getFriends()
+                        "money", userProfile.getMoney(),
+                        "backpack", emptyCollection,
+                        "inventory", emptyCollection,
+                        "friends", emptyCollection
                 )
         );
 

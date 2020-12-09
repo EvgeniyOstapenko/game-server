@@ -14,7 +14,7 @@ public class UserProfile implements IUser {
 
     public int id;
 
-    @Value("#{emptyValue}")
+    @Value("#{empty}")
     private String name;
 
     @Value("#{1}")
