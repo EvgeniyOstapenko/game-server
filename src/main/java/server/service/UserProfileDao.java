@@ -42,9 +42,19 @@ public class UserProfileDao implements UserProfileRegistry {
                 )
         );
         namedParameterJdbcTemplate.update(
-                "insert into user_profile (id) values (:profile_id)",
+                "insert into user_profile (id, name, level, experience, energy, rating, money)" +
+                        " values (:profile_id, :name, :level, :experience, :energy, :rating, :money)",
                 Map.of(
-                        "profile_id", nextUserProfileId
+                        "profile_id", nextUserProfileId,
+                        "name", userProfile.getName(),
+                        "level", userProfile.getLevel(),
+                        "experience", userProfile.getExperience(),
+                        "energy", userProfile.getEnergy(),
+                        "rating", userProfile.getRating(),
+                        "money", userProfile.getMoney()
+//                        "backpack", userProfile.getBackpack(),
+//                        "inventory", userProfile.getInventory(),
+//                        "friends", userProfile.getFriends()
                 )
         );
 

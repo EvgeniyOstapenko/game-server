@@ -26,7 +26,7 @@
     </util:map>
 
     <util:properties id="emptyValue" value-type="java.lang.String">
-        <prop key=""/>
+        <prop key="''"/>
     </util:properties>
 
     <util:list id="emptyBackpackList" value-type="server.domain.BackpackItem">
