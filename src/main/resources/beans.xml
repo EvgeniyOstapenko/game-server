@@ -26,8 +26,17 @@
     </util:map>
 
     <util:properties id="emptyValue" value-type="java.lang.String">
-        <prop key=" "/>
+        <prop key=""/>
     </util:properties>
+
+    <util:list id="emptyBackpackList" value-type="server.domain.BackpackItem">
+    </util:list>
+
+    <util:list id="emptyInventoryItemList" value-type="server.domain.InventoryItem">
+    </util:list>
+
+    <util:set id="emptyFriendsList" value-type="java.lang.Integer">
+    </util:set>
 
     <util:properties id="0" value-type="java.lang.Integer">
         <prop key="0"/>

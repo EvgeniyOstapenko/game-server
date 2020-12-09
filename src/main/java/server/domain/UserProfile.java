@@ -32,13 +32,13 @@ public class UserProfile implements IUser {
     @Value("#{100}")
     private int money;
 
-//    @Value("#{emptyValue}")
+    @Value("#{emptyBackpackList}")
     private List<BackpackItem> backpack;
 
-//    @Value("#{emptyValue}")
+    @Value("#{emptyInventoryItemList}")
     private List<InventoryItem> inventory;
 
-//    @Value("#{emptyValue}")
+    @Value("#{emptyFriendsList}")
     private Set<Integer> friends;
 
     private ProfileState state = ProfileState.MAIN_MENU;
