@@ -2,6 +2,7 @@ package server.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import platform.service.UserProfileRegistry;
 import server.domain.BackpackItem;
 import server.domain.InventoryItem;
 import server.domain.UserProfile;
+import common.dto.UserProfileStructure;
 
 import javax.annotation.Resource;
 import java.sql.ResultSet;
@@ -27,6 +29,9 @@ public class UserProfileDao implements UserProfileRegistry {
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Autowired
+    private UserProfileStructure userProfile;
+
     @Override
     public IUser createNewUserProfile(String uid) {
         Integer nextUserProfileId = namedParameterJdbcTemplate.queryForObject("SELECT nextval('user_profile_sequence')", Collections.emptyMap(), Integer.class);
@@ -39,9 +44,19 @@ public class UserProfileDao implements UserProfileRegistry {
                 )
         );
         namedParameterJdbcTemplate.update(
-                "insert into user_profile (id) values (:profile_id)",
+                "insert into user_profile (id, name, level, experience, energy, rating, money, backpack, inventory, friends)" +
+                        " values (:profile_id, :name, :level, :experience, :energy, :rating, :money, :backpack, :inventory, :friends)",
                 Map.of(
-                        "profile_id", nextUserProfileId
+                        "profile_id", nextUserProfileId,
+                        "name", userProfile.getName(),
+                        "level", userProfile.getLevel(),
+                        "experience", userProfile.getExperience(),
+                        "energy", userProfile.getEnergy(),
+                        "rating", userProfile.getRating(),
+                        "money", userProfile.getMoney(),
+                        "backpack", Arrays.stream(userProfile.getBackpack()).map(Object::toString).collect(Collectors.joining(" ")),
+                        "inventory", Arrays.stream(userProfile.getInventory()).map(Object::toString).collect(Collectors.joining(" ")),
+                        "friends",  Arrays.stream(userProfile.getFriends()).map(Object::toString).collect(Collectors.joining(" "))
                 )
         );
 
