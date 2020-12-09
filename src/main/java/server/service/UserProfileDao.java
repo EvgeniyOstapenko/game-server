@@ -11,7 +11,7 @@ import platform.service.UserProfileRegistry;
 import server.domain.BackpackItem;
 import server.domain.InventoryItem;
 import server.domain.UserProfile;
-import server.dto.UserDefaultProfile;
+import common.dto.UserProfileStructure;
 
 import javax.annotation.Resource;
 import java.sql.ResultSet;
@@ -30,7 +30,7 @@ public class UserProfileDao implements UserProfileRegistry {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Autowired
-    private UserDefaultProfile userDefaultProfile;
+    private UserProfileStructure userProfile;
 
     @Override
     public IUser createNewUserProfile(String uid) {
@@ -48,15 +48,15 @@ public class UserProfileDao implements UserProfileRegistry {
                         " values (:profile_id, :name, :level, :experience, :energy, :rating, :money, :backpack, :inventory, :friends)",
                 Map.of(
                         "profile_id", nextUserProfileId,
-                        "name", userDefaultProfile.getName(),
-                        "level", userDefaultProfile.getLevel(),
-                        "experience", userDefaultProfile.getExperience(),
-                        "energy", userDefaultProfile.getEnergy(),
-                        "rating", userDefaultProfile.getRating(),
-                        "money", userDefaultProfile.getMoney(),
-                        "backpack", userDefaultProfile.getEmptyCollection(),
-                        "inventory", userDefaultProfile.getEmptyCollection(),
-                        "friends", userDefaultProfile.getEmptyCollection()
+                        "name", userProfile.getName(),
+                        "level", userProfile.getLevel(),
+                        "experience", userProfile.getExperience(),
+                        "energy", userProfile.getEnergy(),
+                        "rating", userProfile.getRating(),
+                        "money", userProfile.getMoney(),
+                        "backpack", userProfile.getEmptyCollection(),
+                        "inventory", userProfile.getEmptyCollection(),
+                        "friends", userProfile.getEmptyCollection()
                 )
         );
 
