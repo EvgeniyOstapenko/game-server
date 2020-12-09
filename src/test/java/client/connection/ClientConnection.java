@@ -51,12 +51,6 @@ public class ClientConnection {
                         }
                     });
             channel = bootstrap.connect(new InetSocketAddress(host, port)).syncUninterruptibly().channel();
-            ChannelFuture connect = bootstrap.connect(new InetSocketAddress(host, port));
-            ChannelFuture channelFuture = connect.syncUninterruptibly();
-            channel = channelFuture.channel();
-
-            System.out.println(1111);
-
         } catch (Exception e) {
             log.error(e.toString(), e);
             group.shutdownGracefully().syncUninterruptibly();
