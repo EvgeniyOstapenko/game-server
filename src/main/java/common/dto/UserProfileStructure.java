@@ -17,20 +17,20 @@ public class UserProfileStructure {
     @Value("#{empty}")
     public String name;
 
-    @Value("#{1}")
-    public int level;
+    @Value("#{defaultLevel}")
+    public Integer level;
 
-    @Value("#{0}")
-    public int experience;
+    @Value("#{defaultExperienceAndRating}")
+    public Integer experience;
 
-    @Value("#{25}")
-    public int energy;
+    @Value("#{defaultEnergy}")
+    public Integer energy;
 
-    @Value("#{0}")
-    public int rating;
+    @Value("#{defaultExperienceAndRating}")
+    public Integer rating;
 
-    @Value("#{100}")
-    public int money;
+    @Value("#{defaultMoney}")
+    public Integer money;
 
     @Value("#{emptyBackpackList}")
     public BackpackItem[] backpack;
@@ -39,7 +39,7 @@ public class UserProfileStructure {
     public InventoryItem[] inventory;
 
     @Value("#{emptyFriendsList}")
-    public int[] friends;
+    public Integer[] friends;
 
     @Value("#{empty}")
     private String emptyCollection;
@@ -132,11 +132,11 @@ public class UserProfileStructure {
         this.inventory = inventory;
     }
 
-    public int[] getFriends() {
+    public Integer[] getFriends() {
         return friends;
     }
 
-    public void setFriends(int[] friends) {
+    public void setFriends(Integer[] friends) {
         this.friends = friends;
     }
 

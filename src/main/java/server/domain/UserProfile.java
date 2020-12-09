@@ -59,7 +59,7 @@ public class UserProfile implements IUser {
         dto.money = money;
         dto.backpack = backpack.toArray(new BackpackItem[0]);
         dto.inventory = inventory.toArray(new InventoryItem[0]);
-        dto.friends = friends.stream().mapToInt(i -> i).toArray();
+        dto.friends = friends.toArray(new Integer[0]);
         return dto;
     }
 

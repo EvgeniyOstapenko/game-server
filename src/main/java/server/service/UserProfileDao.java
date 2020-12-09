@@ -54,9 +54,9 @@ public class UserProfileDao implements UserProfileRegistry {
                         "energy", userProfile.getEnergy(),
                         "rating", userProfile.getRating(),
                         "money", userProfile.getMoney(),
-                        "backpack", userProfile.getEmptyCollection(),
-                        "inventory", userProfile.getEmptyCollection(),
-                        "friends", userProfile.getEmptyCollection()
+                        "backpack", Arrays.stream(userProfile.getBackpack()).map(Object::toString).collect(Collectors.joining(" ")),
+                        "inventory", Arrays.stream(userProfile.getInventory()).map(Object::toString).collect(Collectors.joining(" ")),
+                        "friends",  Arrays.stream(userProfile.getFriends()).map(Object::toString).collect(Collectors.joining(" "))
                 )
         );
 

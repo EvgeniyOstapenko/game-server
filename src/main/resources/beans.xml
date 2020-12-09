@@ -29,28 +29,28 @@
     <bean id="empty" class="java.lang.String">
     </bean>
 
+    <bean id="defaultLevel" class="java.lang.Integer">
+        <constructor-arg value="1" />
+    </bean>
+
+    <bean id="defaultExperienceAndRating" class="java.lang.Integer">
+        <constructor-arg value="0" />
+    </bean>
+
+    <bean id="defaultEnergy" class="java.lang.Integer">
+        <constructor-arg value="25" />
+    </bean>
+
+    <bean id="defaultMoney" class="java.lang.Integer">
+        <constructor-arg value="100" />
+    </bean>
+
     <util:list id="emptyBackpackList" value-type="server.domain.BackpackItem">
     </util:list>
 
     <util:list id="emptyInventoryItemList" value-type="server.domain.InventoryItem">
     </util:list>
 
-    <util:set id="emptyFriendsList" value-type="java.lang.Integer">
-    </util:set>
-
-    <util:properties id="0" value-type="java.lang.Integer">
-        <prop key="0"/>
-    </util:properties>
-
-    <util:properties id="1" value-type="java.lang.Integer">
-        <prop key="1"/>
-    </util:properties>
-
-    <util:properties id="25" value-type="java.lang.Integer">
-        <prop key="25"/>
-    </util:properties>
-
-    <util:properties id="100" value-type="java.lang.Integer">
-        <prop key="100"/>
-    </util:properties>
+    <util:list id="emptyFriendsList" value-type="java.lang.Integer">
+    </util:list>
 </beans>
