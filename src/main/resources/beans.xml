@@ -25,4 +25,23 @@
         </entry>
     </util:map>
 
+    <util:properties id="emptyValue" value-type="java.lang.String">
+        <prop key=" "/>
+    </util:properties>
+
+    <util:properties id="0" value-type="java.lang.Integer">
+        <prop key="0"/>
+    </util:properties>
+
+    <util:properties id="1" value-type="java.lang.Integer">
+        <prop key="1"/>
+    </util:properties>
+
+    <util:properties id="25" value-type="java.lang.Integer">
+        <prop key="25"/>
+    </util:properties>
+
+    <util:properties id="100" value-type="java.lang.Integer">
+        <prop key="100"/>
+    </util:properties>
 </beans>

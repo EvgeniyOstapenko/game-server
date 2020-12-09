@@ -1,35 +1,50 @@
 package server.domain;
 
 import common.dto.UserProfileStructure;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import platform.domain.IUser;
 import server.common.ProfileState;
 
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class UserProfile implements IUser {
 
-    public final int id;
+    public int id;
 
+    @Value("#{emptyValue}")
     private String name;
 
+    @Value("#{1}")
     private int level;
 
+    @Value("#{0}")
     private int experience;
 
+    @Value("#{25}")
     private int energy;
 
+    @Value("#{0}")
     private int rating;
 
+    @Value("#{100}")
     private int money;
 
+//    @Value("#{emptyValue}")
     private List<BackpackItem> backpack;
 
+//    @Value("#{emptyValue}")
     private List<InventoryItem> inventory;
 
+//    @Value("#{emptyValue}")
     private Set<Integer> friends;
 
     private ProfileState state = ProfileState.MAIN_MENU;
+
+    public UserProfile() {
+    }
 
     public UserProfile(int id) {
         this.id = id;

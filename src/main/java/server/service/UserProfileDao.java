@@ -27,6 +27,9 @@ public class UserProfileDao implements UserProfileRegistry {
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Resource
+    private UserProfile userProfile;
+
     @Override
     public IUser createNewUserProfile(String uid) {
         Integer nextUserProfileId = namedParameterJdbcTemplate.queryForObject("SELECT nextval('user_profile_sequence')", Collections.emptyMap(), Integer.class);
