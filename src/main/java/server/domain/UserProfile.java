@@ -1,15 +1,12 @@
 package server.domain;
 
 import common.dto.UserProfileStructure;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import platform.domain.IUser;
 import server.common.ProfileState;
 
 import java.util.List;
 import java.util.Set;
 
-@Component
 public class UserProfile implements IUser {
 
     public final int id;
