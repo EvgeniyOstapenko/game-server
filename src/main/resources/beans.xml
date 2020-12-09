@@ -25,4 +25,32 @@
         </entry>
     </util:map>
 
+
+    <bean id="empty" class="java.lang.String">
+    </bean>
+
+    <bean id="defaultLevel" class="java.lang.Integer">
+        <constructor-arg value="1" />
+    </bean>
+
+    <bean id="defaultExperienceAndRating" class="java.lang.Integer">
+        <constructor-arg value="0" />
+    </bean>
+
+    <bean id="defaultEnergy" class="java.lang.Integer">
+        <constructor-arg value="25" />
+    </bean>
+
+    <bean id="defaultMoney" class="java.lang.Integer">
+        <constructor-arg value="100" />
+    </bean>
+
+    <util:list id="emptyBackpackList" value-type="server.domain.BackpackItem">
+    </util:list>
+
+    <util:list id="emptyInventoryItemList" value-type="server.domain.InventoryItem">
+    </util:list>
+
+    <util:list id="emptyFriendsList" value-type="java.lang.Integer">
+    </util:list>
 </beans>
