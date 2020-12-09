@@ -2,7 +2,7 @@ package server.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ import platform.service.UserProfileRegistry;
 import server.domain.BackpackItem;
 import server.domain.InventoryItem;
 import server.domain.UserProfile;
+import server.dto.UserDefaultProfile;
 
 import javax.annotation.Resource;
 import java.sql.ResultSet;
@@ -28,11 +29,8 @@ public class UserProfileDao implements UserProfileRegistry {
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    @Resource
-    private UserProfile userProfile;
-
-    @Value("#{empty}")
-    private String emptyCollection;
+    @Autowired
+    private UserDefaultProfile userDefaultProfile;
 
     @Override
     public IUser createNewUserProfile(String uid) {
@@ -50,15 +48,15 @@ public class UserProfileDao implements UserProfileRegistry {
                         " values (:profile_id, :name, :level, :experience, :energy, :rating, :money, :backpack, :inventory, :friends)",
                 Map.of(
                         "profile_id", nextUserProfileId,
-                        "name", userProfile.getName(),
-                        "level", userProfile.getLevel(),
-                        "experience", userProfile.getExperience(),
-                        "energy", userProfile.getEnergy(),
-                        "rating", userProfile.getRating(),
-                        "money", userProfile.getMoney(),
-                        "backpack", emptyCollection,
-                        "inventory", emptyCollection,
-                        "friends", emptyCollection
+                        "name", userDefaultProfile.getName(),
+                        "level", userDefaultProfile.getLevel(),
+                        "experience", userDefaultProfile.getExperience(),
+                        "energy", userDefaultProfile.getEnergy(),
+                        "rating", userDefaultProfile.getRating(),
+                        "money", userDefaultProfile.getMoney(),
+                        "backpack", userDefaultProfile.getEmptyCollection(),
+                        "inventory", userDefaultProfile.getEmptyCollection(),
+                        "friends", userDefaultProfile.getEmptyCollection()
                 )
         );
 

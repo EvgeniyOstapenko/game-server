@@ -1,70 +1,45 @@
-package server.domain;
+package server.dto;
 
-import common.dto.UserProfileStructure;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import platform.domain.IUser;
-import server.common.ProfileState;
+import server.domain.BackpackItem;
+import server.domain.InventoryItem;
 
 import java.util.List;
 import java.util.Set;
 
 @Component
-public class UserProfile implements IUser {
+public class UserDefaultProfile {
 
-    public final int id;
-
+    @Value("#{empty}")
     private String name;
 
+    @Value("#{1}")
     private int level;
 
+    @Value("#{0}")
     private int experience;
 
+    @Value("#{25}")
     private int energy;
 
+    @Value("#{0}")
     private int rating;
 
+    @Value("#{100}")
     private int money;
 
+    @Value("#{emptyBackpackList}")
     private List<BackpackItem> backpack;
 
+    @Value("#{emptyInventoryItemList}")
     private List<InventoryItem> inventory;
 
+    @Value("#{emptyFriendsList}")
     private Set<Integer> friends;
 
-    private ProfileState state = ProfileState.MAIN_MENU;
-
-    public UserProfile(int id) {
-        this.id = id;
-    }
-
-    public UserProfile(int id, String name, int level, int experience, int energy, int rating, int money, List<BackpackItem> backpack, List<InventoryItem> inventory, Set<Integer> friends) {
-        this.id = id;
-        this.name = name;
-        this.level = level;
-        this.experience = experience;
-        this.energy = energy;
-        this.rating = rating;
-        this.money = money;
-        this.backpack = backpack;
-        this.inventory = inventory;
-        this.friends = friends;
-    }
-
-    public UserProfileStructure serialize() {
-        var dto = new UserProfileStructure();
-        dto.id = id;
-        dto.name = name;
-        dto.level = level;
-        dto.experience = experience;
-        dto.energy = energy;
-        dto.rating = rating;
-        dto.money = money;
-        dto.backpack = backpack.toArray(new BackpackItem[0]);
-        dto.inventory = inventory.toArray(new InventoryItem[0]);
-        dto.friends = friends.stream().mapToInt(i -> i).toArray();
-        return dto;
-    }
+    @Value("#{empty}")
+    private String emptyCollection;
 
     public String getName() {
         return name;
@@ -86,16 +61,16 @@ public class UserProfile implements IUser {
         return experience;
     }
 
+    public void setExperience(int experience) {
+        this.experience = experience;
+    }
+
     public int getEnergy() {
         return energy;
     }
 
     public void setEnergy(int energy) {
         this.energy = energy;
-    }
-
-    public void setExperience(int experience) {
-        this.experience = experience;
     }
 
     public int getRating() {
@@ -138,16 +113,11 @@ public class UserProfile implements IUser {
         this.friends = friends;
     }
 
-    public ProfileState getState() {
-        return state;
+    public String getEmptyCollection() {
+        return emptyCollection;
     }
 
-    public void setState(ProfileState state) {
-        this.state = state;
-    }
-
-    @Override
-    public int id() {
-        return id;
+    public void setEmptyCollection(String emptyCollection) {
+        this.emptyCollection = emptyCollection;
     }
 }

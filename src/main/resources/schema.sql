@@ -10,8 +10,8 @@ CREATE TABLE user_profile
     rating     INT         NOT NULL,
     money      INT         NOT NULL,
     backpack   VARCHAR     NOT NULL,
-    inventory  VARCHAR     NOT NULL DEFAULT '',
-    friends    VARCHAR     NOT NULL DEFAULT ''
+    inventory  VARCHAR     NOT NULL,
+    friends    VARCHAR     NOT NULL
 );
 
 
