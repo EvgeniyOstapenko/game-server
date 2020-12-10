@@ -53,4 +53,9 @@
 
     <util:list id="emptyFriendsList" value-type="java.lang.Integer">
     </util:list>
+
+    <bean id="costOfGame" class="java.lang.Integer">
+        <constructor-arg value="5" />
+    </bean>
+
 </beans>
