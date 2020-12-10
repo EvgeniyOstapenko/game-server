@@ -2,6 +2,7 @@ package platform.connection;
 
 import common.messages.AbstractResponse;
 import common.util.KeyValue;
+import common.util.MessageUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,13 +26,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static common.util.MessageUtil.isRequestDuplicate;
+//import static common.util.MessageUtil.checkStartOrFinishDuplicateState;
 
 @Service
 @ChannelHandler.Sharable
 public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    MessageUtil messageUtil;
 
     @Resource
     private AuthService authService;
@@ -66,6 +70,8 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, final Object message) throws Exception {
+        messageUtil.checkStartOrFinishDuplicateState(message);
+
         var channel = ctx.channel();
         if (message instanceof ILogin) {
             var error = new KeyValue<Integer, String>();
@@ -80,7 +86,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
             }
         } else {
             var messageController = controllers.get(message.getClass());
-            if (messageController != null || !isRequestDuplicate(message)) {
+            if (messageController != null) {
                 var outMessage = messageController.onMessage(message, openConnections.get(channel).profile);
                 if (outMessage != null) {
                     channel.writeAndFlush(outMessage);

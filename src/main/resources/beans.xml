@@ -58,4 +58,8 @@
         <constructor-arg value="5" />
     </bean>
 
+    <bean id="duplicateMessageStateExceptionMessage" class="java.lang.String">
+        <constructor-arg value="Inappropriate order of requests: two requests of type [%s] go straight one after another" />
+    </bean>
+
 </beans>

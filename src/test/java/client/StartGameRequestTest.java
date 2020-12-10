@@ -15,4 +15,11 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
 
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
     }
+
+
+//    @Test
+//    public void StartGameRequestTestWithDuplicateStartGameRequest() {
+//
+//        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+//    }
 }
