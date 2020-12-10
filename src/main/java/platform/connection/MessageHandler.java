@@ -1,6 +1,6 @@
 package platform.connection;
 
-import platform.messages.ILogin;
+import common.messages.AbstractResponse;
 import common.util.KeyValue;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import platform.messages.ILogin;
 import platform.service.AuthService;
 import platform.service.LoginController;
 import platform.service.MessageController;
@@ -17,11 +18,14 @@ import platform.session.Session;
 import platform.session.SessionMap;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static common.util.MessageUtil.isRequestDuplicate;
 
 @Service
 @ChannelHandler.Sharable
@@ -38,9 +42,14 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
     @Resource
     private SessionMap sessionMap;
 
+    private ArrayList<? extends AbstractResponse> requests;
+
     private Map<Channel, Session> openConnections = new ConcurrentHashMap<>();
 
     private Map<Class, MessageController> controllers = Collections.emptyMap();
+
+    public MessageHandler() {
+    }
 
     @Autowired(required = false)
     private void setControllers(List<MessageController> controllers) {
@@ -71,7 +80,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
             }
         } else {
             var messageController = controllers.get(message.getClass());
-            if (messageController != null) {
+            if (messageController != null || !isRequestDuplicate(message)) {
                 var outMessage = messageController.onMessage(message, openConnections.get(channel).profile);
                 if (outMessage != null) {
                     channel.writeAndFlush(outMessage);
