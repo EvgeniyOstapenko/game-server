@@ -8,4 +8,9 @@ public class FinishGameResponse {
 
     public AwardStructure award;
 
+    @Override
+    public String toString() {
+        return "FinishGameResponse{}";
+    }
+
 }

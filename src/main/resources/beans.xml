@@ -62,4 +62,12 @@
         <constructor-arg value="Inappropriate order of requests: two requests of type [%s] go straight one after another" />
     </bean>
 
+    <bean id="startGameRequest" class="java.lang.String">
+        <constructor-arg value="StartGameRequest{}" />
+    </bean>
+
+    <bean id="finishGameRequest" class="java.lang.String">
+        <constructor-arg value="finishGameRequest{}" />
+    </bean>
+
 </beans>

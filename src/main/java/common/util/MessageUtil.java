@@ -16,12 +16,18 @@ public class MessageUtil {
     @Value("#{duplicateMessageStateExceptionMessage}")
     private String errorMessage;
 
+    @Value("#{startGameRequest}")
+    private String startGameRequest;
+
+    @Value("#{finishGameRequest}")
+    private String finishGameRequest;
+
     public void checkStartOrFinishDuplicateState(Object request) throws DuplicateMessageStateException {
-        if (!isRequestDuplicate(request)) throw new DuplicateMessageStateException(errorMessage, request);
+        if (isRequestDuplicate(request)) throw new DuplicateMessageStateException(errorMessage, request);
     }
 
-    private static boolean isRequestDuplicate(Object message) {
-        if (message instanceof StartGameResponse || message instanceof FinishGameResponse) {
+    private boolean isRequestDuplicate(Object message) {
+        if (message.toString().equals(startGameRequest) || message.toString().equals(finishGameRequest)) {
             if (requests.isEmpty()) {
                 requests.push(message);
                 return false;

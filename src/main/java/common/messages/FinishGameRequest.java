@@ -8,4 +8,9 @@ public class FinishGameRequest {
 
     public GameResult result;
 
+    @Override
+    public String toString() {
+        return "FinishGameRequest{}";
+    }
+
 }
