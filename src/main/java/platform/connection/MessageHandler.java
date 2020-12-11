@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-//import static common.util.MessageUtil.checkStartOrFinishDuplicateState;
 
 @Service
 @ChannelHandler.Sharable
@@ -47,9 +46,6 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     private Map<Class, MessageController> controllers = Collections.emptyMap();
 
-    public MessageHandler() {
-    }
-
     @Autowired(required = false)
     private void setControllers(List<MessageController> controllers) {
         this.controllers = controllers.stream().collect(Collectors.toMap(MessageController::messageClass, c -> c));
@@ -65,7 +61,6 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, final Object message) throws Exception {
-
         var channel = ctx.channel();
         if (message instanceof ILogin) {
             var error = new KeyValue<Integer, String>();
