@@ -11,8 +11,7 @@ public class DuplicateMessageStateException extends RuntimeException {
         this.wrongRequestInOrder = wrongOrderRequest;
     }
 
-    @Override
-    public String toString() {
+    public String getReason() {
         return String.format(errorMessage, wrongRequestInOrder);
     }
 

@@ -26,7 +26,7 @@ public class MessageUtil {
         if (isRequestDuplicate(request)) throw new DuplicateMessageStateException(errorMessage, request);
     }
 
-    private boolean isRequestDuplicate(Object message) {
+    public boolean isRequestDuplicate(Object message) {
         if (message.toString().equals(startGameRequest) || message.toString().equals(finishGameRequest)) {
             if (requests.isEmpty()) {
                 requests.push(message);
@@ -38,7 +38,8 @@ public class MessageUtil {
                 requests.push(message);
                 return false;
             }
+            return true;
         }
-        return true;
+        return false;
     }
 }

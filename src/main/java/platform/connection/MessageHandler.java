@@ -1,12 +1,9 @@
 package platform.connection;
 
-import common.messages.AbstractResponse;
+import common.exception.DuplicateMessageStateException;
 import common.util.KeyValue;
 import common.util.MessageUtil;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,6 @@ import platform.session.Session;
 import platform.session.SessionMap;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +42,6 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
     @Resource
     private SessionMap sessionMap;
 
-    private ArrayList<? extends AbstractResponse> requests;
-
     private Map<Channel, Session> openConnections = new ConcurrentHashMap<>();
 
     private Map<Class, MessageController> controllers = Collections.emptyMap();
@@ -70,7 +64,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, final Object message) throws Exception {
-        messageUtil.checkStartOrFinishDuplicateState(message);
+//        validateStartGameAndFinishGAmeRequests(message, ctx);
 
         var channel = ctx.channel();
         if (message instanceof ILogin) {
@@ -87,6 +81,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         } else {
             var messageController = controllers.get(message.getClass());
             if (messageController != null) {
+                var responseMessage = getResponseMessage(message);
                 var outMessage = messageController.onMessage(message, openConnections.get(channel).profile);
                 if (outMessage != null) {
                     channel.writeAndFlush(outMessage);
@@ -115,4 +110,16 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    private void validateStartGameAndFinishGAmeRequests(Object message, ChannelHandlerContext ctx) {
+        try {
+            messageUtil.checkStartOrFinishDuplicateState(message);
+        } catch (DuplicateMessageStateException error) {
+            String errorMessage = error.getReason();
+            log.error(errorMessage, message.getClass());
+        }
+    }
+
+    private Object getResponseMessage(Object message){
+
+    }
 }
