@@ -22,6 +22,8 @@ public class MessageUtil {
     @Value("#{finishGameRequest}")
     private String finishGameRequest;
 
+    private Object request;
+
     public void checkStartOrFinishDuplicateState(Object request) throws DuplicateMessageStateException {
         if (isRequestDuplicate(request)) throw new DuplicateMessageStateException(errorMessage, request);
     }
@@ -41,5 +43,13 @@ public class MessageUtil {
             return true;
         }
         return false;
+    }
+
+    public String getStartOrFinishDuplicateStateErrorMessage() {
+        return String.format(errorMessage, request);
+    }
+
+    public void setRequest(Object request) {
+        this.request = request;
     }
 }

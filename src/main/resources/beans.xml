@@ -59,7 +59,7 @@
     </bean>
 
     <bean id="duplicateMessageStateExceptionMessage" class="java.lang.String">
-        <constructor-arg value="Inappropriate order of requests: two requests of type [%s] go straight one after another" />
+        <constructor-arg value="Inappropriate order of requests: two duplicate requests were found of type [%s]" />
     </bean>
 
     <bean id="startGameRequest" class="java.lang.String">

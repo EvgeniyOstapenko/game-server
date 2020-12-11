@@ -1,6 +1,7 @@
 package platform.connection;
 
 import common.exception.DuplicateMessageStateException;
+import common.messages.ErrorResponse;
 import common.util.KeyValue;
 import common.util.MessageUtil;
 import io.netty.channel.*;
@@ -64,7 +65,6 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, final Object message) throws Exception {
-//        validateStartGameAndFinishGAmeRequests(message, ctx);
 
         var channel = ctx.channel();
         if (message instanceof ILogin) {
@@ -81,8 +81,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         } else {
             var messageController = controllers.get(message.getClass());
             if (messageController != null) {
-                var responseMessage = getResponseMessage(message);
-                var outMessage = messageController.onMessage(message, openConnections.get(channel).profile);
+                var outMessage = getResponseMessage(message, messageController, channel);
                 if (outMessage != null) {
                     channel.writeAndFlush(outMessage);
                 }
@@ -119,7 +118,14 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private Object getResponseMessage(Object message){
-
+    private Object getResponseMessage(Object message, MessageController messageController, Channel channel){
+        if(!messageUtil.isRequestDuplicate(message)){
+            return messageController.onMessage(message, openConnections.get(channel).profile);
+        }
+        messageUtil.setRequest(message);
+        var errorMessage = messageUtil.getStartOrFinishDuplicateStateErrorMessage();
+        log.error(errorMessage, message.getClass());
+        var response = new ErrorResponse(errorMessage);
+        return response;
     }
 }
