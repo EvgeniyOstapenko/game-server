@@ -1,9 +1,7 @@
 package client;
 
 import common.exception.DuplicateMessageStateException;
-import common.messages.ErrorResponse;
-import common.messages.StartGameRequest;
-import common.messages.StartGameResponse;
+import common.messages.*;
 //import org.junit.Test;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,9 +20,9 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
 
     @Test
     public void startGameRequestTestWithDuplicateStartInTheRowGameRequestShouldReturnErrorResponse() {
-        successLoginTest();
 
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
         clientConnection.request(new StartGameRequest(), ErrorResponse.class);
+        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
     }
 }
