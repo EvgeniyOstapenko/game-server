@@ -15,9 +15,8 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
 
     @Test
     public void start() throws Exception {
-        successLoginTest();
 
-        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+        clientConnection.request(new StartGameRequest(), ErrorResponse.class);
     }
 
 
