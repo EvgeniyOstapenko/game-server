@@ -21,7 +21,6 @@ public interface Messages {
         put((short) i++,  FinishGameResponse.class);
         put((short) i++,  TopRequest.class);
         put((short) i++,  TopResponse.class);
-        put((short) i++,  ErrorResponse.class);
     }});
 
 }

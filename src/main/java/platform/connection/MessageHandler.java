@@ -1,7 +1,7 @@
 package platform.connection;
 
 import common.exception.DuplicateMessageStateException;
-import common.messages.ErrorResponse;
+import common.messages.StartGameResponse;
 import common.util.KeyValue;
 import common.util.MessageUtil;
 import io.netty.channel.*;
@@ -120,7 +120,8 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         messageUtil.setRequest(message);
         var errorMessage = messageUtil.getStartOrFinishDuplicateStateErrorMessage();
         log.error(errorMessage, message.getClass());
-        var response = new ErrorResponse(errorMessage);
+
+        var response = new StartGameResponse(1, errorMessage);
         return response;
     }
 }
