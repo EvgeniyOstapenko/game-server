@@ -67,7 +67,7 @@
     </bean>
 
     <bean id="finishGameRequest" class="java.lang.String">
-        <constructor-arg value="finishGameRequest{}" />
+        <constructor-arg value="FinishGameRequest{}" />
     </bean>
 
 </beans>

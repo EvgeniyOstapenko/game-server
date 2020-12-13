@@ -43,7 +43,6 @@ public class ProfileTests extends ConnectAndLoginTests {
 
     @Test
     @Order(1)
-    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void withdrawEnergyByStartGameTest() {
 //        successLoginTest();
         profile = profileService.selectUserProfile(TEST_PROFILE_ID);
@@ -89,7 +88,7 @@ public class ProfileTests extends ConnectAndLoginTests {
         assertSame(0, response.errorCode);
 
 
-        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
+//        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
     }
 
     @Test
@@ -114,7 +113,7 @@ public class ProfileTests extends ConnectAndLoginTests {
         assertEquals(errorMessage, response.errorMessage);
 
 
-        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
+//        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
     }
 
 }

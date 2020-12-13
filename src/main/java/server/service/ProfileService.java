@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.test.context.TestPropertySource;
 import platform.service.UserProfileRegistry;
 import server.common.GameResult;
 import server.domain.UserProfile;
@@ -16,6 +17,7 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 @Service
+@TestPropertySource("/application.properties")
 public class ProfileService {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -30,7 +32,13 @@ public class ProfileService {
     private Map<Integer, AwardStructure> levelUpAwardConfig;
 
     @Value("#{costOfGame}")
-    Integer costOfGame;
+    Integer ENERGY_GAME_PRICE;
+
+    @Value("${ratingErrorMessage}")
+    String RATING_ERROR_MESSAGE;
+
+    @Value("${energyErrorMessage}")
+    String ENERGY_ERROR_MESSAGE;
 
     public UserProfile findUserProfileOrCreateNew(String uid) {
         var profile = userProfileRegistry.findUserProfileByUid(uid);
@@ -44,12 +52,11 @@ public class ProfileService {
         return (UserProfile) userProfileRegistry.selectUserProfile(profileId);
     }
 
-    public StartGameResponse withdrawEnergyByStartGame(Integer userId) {
-        StartGameResponse response = getResponse(userId);
-        return response;
+    public StartGameResponse takeActionsOnStartGame(Integer userId) {
+        return getStartGameResponse(userId);
     }
 
-    public FinishGameResponse finishGame(FinishGameRequest request, Integer userId) {
+    public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, Integer userId) {
         if (request.getResult().equals(GameResult.WIN)) {
             return takeWinningActions(userId);
         }
@@ -78,15 +85,15 @@ public class ProfileService {
 
         var finishGameResponse = new FinishGameResponse();
         finishGameResponse.errorCode = 1;
-        finishGameResponse.errorMessage = "Not enough rating!";
+        finishGameResponse.errorMessage = RATING_ERROR_MESSAGE;
 
         return finishGameResponse;
     }
 
-    private StartGameResponse getResponse(Integer userId) {
+    private StartGameResponse getStartGameResponse(Integer userId) {
         UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
-        if (user.getEnergy() >= costOfGame) {
-            user.setEnergy(user.getEnergy() - costOfGame);
+        if (user.getEnergy() >= ENERGY_GAME_PRICE) {
+            user.setEnergy(user.getEnergy() - ENERGY_GAME_PRICE);
             userProfileRegistry.updateUserProfile(user);
 
             return new StartGameResponse();
@@ -94,7 +101,7 @@ public class ProfileService {
 
         var startGameResponse = new StartGameResponse();
         startGameResponse.errorCode = 1;
-        startGameResponse.errorMessage = "Not enough energy!";
+        startGameResponse.errorMessage = ENERGY_ERROR_MESSAGE;
 
         return startGameResponse;
     }

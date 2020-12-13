@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 @TestPropertySource("/application-test.properties")
 public class StartGameRequestTest extends ConnectAndLoginTests {
 
-    @Value("${StartGameRequestErrorMessage}")
-    String errorMessage;
+    @Value("${duplicateStartRequestsErrorMessage}")
+    String duplicateRequestsErrorMessage;
 
     @Test
     @Order(1)
@@ -37,9 +37,9 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
 
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
         StartGameResponse response = clientConnection.request(new StartGameRequest(), StartGameResponse.class);
-        assertSame(1, response.errorCode);
-        assertEquals(errorMessage, response.errorMessage);
+        assertSame(2, response.errorCode);
+        assertEquals(duplicateRequestsErrorMessage, response.errorMessage);
 
-        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
+//        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
     }
 }

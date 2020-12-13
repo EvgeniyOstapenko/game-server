@@ -1,6 +1,7 @@
 package platform.connection;
 
 import common.exception.DuplicateMessageStateException;
+import common.messages.AbstractResponse;
 import common.messages.StartGameResponse;
 import common.util.KeyValue;
 import common.util.MessageUtil;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import platform.domain.IUser;
 import platform.messages.ILogin;
 import platform.service.AuthService;
 import platform.service.LoginController;
@@ -114,14 +116,27 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
     }
 
     private Object getResponseMessage(Object message, MessageController messageController, Channel channel){
+        IUser profile = openConnections.get(channel).profile;
+
         if(!messageUtil.isRequestDuplicate(message)){
-            return messageController.onMessage(message, openConnections.get(channel).profile);
+            return messageController.onMessage(message, profile);
         }
+
+        String errorMessage = toLogException(message);
+
+        var response = messageController.onMessage(message, profile);
+        AbstractResponse errorResponse = (AbstractResponse)response;
+        errorResponse.errorCode = 2;
+        errorResponse.errorMessage = errorMessage;
+
+        return response;
+    }
+
+    private String toLogException(Object message) {
         messageUtil.setRequest(message);
         var errorMessage = messageUtil.getStartOrFinishDuplicateStateErrorMessage();
         log.error(errorMessage, message.getClass());
 
-        var response = new StartGameResponse(1, errorMessage);
-        return response;
+        return errorMessage;
     }
 }

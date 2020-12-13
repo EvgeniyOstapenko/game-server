@@ -1,1 +1,2 @@
+--insert into user_profile (id, name, level, experience, energy, rating, money, backpack, inventory, friends) values (1, '', 1, 0, 25, 0, 100, '', '', '');
 update user_profile set energy = 25 where id = 1;
