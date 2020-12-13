@@ -13,4 +13,11 @@ public class FinishGameRequest {
         return "FinishGameRequest{}";
     }
 
+    public GameResult getResult() {
+        return result;
+    }
+
+    public void setResult(GameResult result) {
+        this.result = result;
+    }
 }

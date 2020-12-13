@@ -38,12 +38,15 @@ public class ProfileTests extends ConnectAndLoginTests {
     @Value("${errorMessage}")
     String errorMessage;
 
+    @Value("${testProfileId}")
+    Integer TEST_PROFILE_ID;
+
     @Test
     @Order(1)
     @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void withdrawEnergyByStartGameTest() {
 //        successLoginTest();
-        profile = profileService.selectUserProfile(1);
+        profile = profileService.selectUserProfile(TEST_PROFILE_ID);
 
         assertSame(25, profile.getEnergy());
         assertSame(100, profile.getMoney());
@@ -81,7 +84,7 @@ public class ProfileTests extends ConnectAndLoginTests {
         StartGameResponse response = clientConnection.request(new StartGameRequest(), StartGameResponse.class);
 
         //THEN
-        profile = profileService.selectUserProfile(1);
+        profile = profileService.selectUserProfile(TEST_PROFILE_ID);
         assertSame(20, profile.getEnergy());
         assertSame(0, response.errorCode);
 
@@ -105,7 +108,7 @@ public class ProfileTests extends ConnectAndLoginTests {
         StartGameResponse response = clientConnection.request(startGameRequest, StartGameResponse.class);
 
         //THEN
-        profile = profileService.selectUserProfile(1);
+        profile = profileService.selectUserProfile(TEST_PROFILE_ID);
         assertSame(0, profile.getEnergy());
         assertSame(1, response.errorCode);
         assertEquals(errorMessage, response.errorMessage);
