@@ -1,0 +1,1 @@
+update user_profile set energy = 25 where id = 1;

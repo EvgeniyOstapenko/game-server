@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import server.ServerApplication;
 import server.domain.UserProfile;
 import server.service.ProfileService;
@@ -39,9 +40,10 @@ public class ProfileTests extends ConnectAndLoginTests {
 
     @Test
     @Order(1)
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void withdrawEnergyByStartGameTest() {
-        successLoginTest();
-        profile = profileService.selectUserProfile(enterAccount.userProfile.id);
+//        successLoginTest();
+        profile = profileService.selectUserProfile(1);
 
         assertSame(25, profile.getEnergy());
         assertSame(100, profile.getMoney());
@@ -70,9 +72,10 @@ public class ProfileTests extends ConnectAndLoginTests {
     }
 
     @Test
-    @Order(2)
-    public void withdrawEnergyByStartGameTestWithRealRequestShouldPassedAndEnergyBeChangedInUserProfileDataBase() {
-//        successLoginTest();
+//    @Order(2)
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void withdrawEnergyByStartGameTestWithRealRequestShouldPassAndEnergyBeChangedInUserProfileDataBase() {
+        successLoginTest();
 
         //WHEN
         StartGameResponse response = clientConnection.request(new StartGameRequest(), StartGameResponse.class);
@@ -88,7 +91,8 @@ public class ProfileTests extends ConnectAndLoginTests {
 
     @Test
     @Order(3)
-    public void withdrawEnergyByStartGameTestRequestShouldNotPassedAndReturnErrorMessageAndEnergyEqualZeroAndCodeError() {
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void withdrawEnergyByStartGameTestRequestShouldNotPassAndReturnErrorMessageAndEnergyEqualZeroAndCodeError() {
 //        successLoginTest();
         StartGameRequest startGameRequest = new StartGameRequest();
 
