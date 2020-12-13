@@ -5,13 +5,12 @@ import common.messages.FinishGameResponse;
 import common.messages.StartGameRequest;
 import common.messages.StartGameResponse;
 import common.util.MessageUtil;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
-import platform.service.UserProfileRegistry;
 import server.ServerApplication;
 import server.domain.UserProfile;
 import server.service.ProfileService;
@@ -39,6 +38,7 @@ public class ProfileTests extends ConnectAndLoginTests {
     String errorMessage;
 
     @Test
+    @Order(1)
     public void withdrawEnergyByStartGameTest() {
         successLoginTest();
         profile = profileService.selectUserProfile(enterAccount.userProfile.id);
@@ -70,6 +70,24 @@ public class ProfileTests extends ConnectAndLoginTests {
     }
 
     @Test
+    @Order(2)
+    public void withdrawEnergyByStartGameTestWithRealRequestShouldPassedAndEnergyBeChangedInUserProfileDataBase() {
+//        successLoginTest();
+
+        //WHEN
+        StartGameResponse response = clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+
+        //THEN
+        profile = profileService.selectUserProfile(1);
+        assertSame(20, profile.getEnergy());
+        assertSame(0, response.errorCode);
+
+
+        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
+    }
+
+    @Test
+    @Order(3)
     public void withdrawEnergyByStartGameTestRequestShouldNotPassedAndReturnErrorMessageAndEnergyEqualZeroAndCodeError() {
 //        successLoginTest();
         StartGameRequest startGameRequest = new StartGameRequest();
@@ -87,22 +105,6 @@ public class ProfileTests extends ConnectAndLoginTests {
         assertSame(0, profile.getEnergy());
         assertSame(1, response.errorCode);
         assertEquals(errorMessage, response.errorMessage);
-
-
-        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
-    }
-
-    @Test
-    public void withdrawEnergyByStartGameTestWithRealRequestShouldPassedAndEnergyBeChangedInUserProfileDataBase() {
-//        successLoginTest();
-
-        //WHEN
-        StartGameResponse response = clientConnection.request(new StartGameRequest(), StartGameResponse.class);
-
-        //THEN
-        profile = profileService.selectUserProfile(1);
-        assertSame(20, profile.getEnergy());
-        assertSame(0, response.errorCode);
 
 
         clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);

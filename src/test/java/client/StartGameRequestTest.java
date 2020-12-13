@@ -4,6 +4,7 @@ import common.messages.FinishGameRequest;
 import common.messages.FinishGameResponse;
 import common.messages.StartGameRequest;
 import common.messages.StartGameResponse;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +22,7 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
     String errorMessage;
 
     @Test
+    @Order(1)
     public void start() throws Exception {
         successLoginTest();
 
@@ -29,6 +31,7 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
 
 
     @Test
+    @Order(2)
     public void onMessageTestWithDuplicateStartInTheRowGameRequestShouldReturnErrorResponse() {
 //        successLoginTest();
 
