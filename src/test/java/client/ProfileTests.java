@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import server.ServerApplication;
+import server.common.GameResult;
 import server.domain.UserProfile;
 import server.service.ProfileService;
 
@@ -43,6 +44,7 @@ public class ProfileTests extends ConnectAndLoginTests {
 
     @Test
     @Order(1)
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void withdrawEnergyByStartGameTest() {
 //        successLoginTest();
         profile = profileService.selectUserProfile(TEST_PROFILE_ID);
@@ -88,7 +90,9 @@ public class ProfileTests extends ConnectAndLoginTests {
         assertSame(0, response.errorCode);
 
 
-//        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
+        FinishGameRequest finishGameRequest = new FinishGameRequest();
+        finishGameRequest.setResult(GameResult.WIN);
+        clientConnection.request(finishGameRequest, FinishGameResponse.class);
     }
 
     @Test
