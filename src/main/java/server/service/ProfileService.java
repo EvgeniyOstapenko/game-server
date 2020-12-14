@@ -14,7 +14,11 @@ import server.common.GameResult;
 import server.domain.UserProfile;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @TestPropertySource("/application.properties")
@@ -69,8 +73,11 @@ public class ProfileService {
     private FinishGameResponse takeWinningActions(Integer userId) {
         UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
         user.setExperience(user.getExperience() + 10);
-        user.setMoney(user.getMoney() + 10);
-        user.setRating(user.getRating() + 3);
+        UserProfile currentUser = recalculateUserLevel(user);
+
+        currentUser.setMoney(currentUser.getMoney() + 10);
+        currentUser.setRating(currentUser.getRating() + 3);
+        userProfileRegistry.updateUserProfile(currentUser);
 
         return new FinishGameResponse();
     }
@@ -78,10 +85,11 @@ public class ProfileService {
     private FinishGameResponse takeLosingActions(Integer userId) {
         UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
         user.setExperience(user.getExperience() + 3);
+        UserProfile currentUser = recalculateUserLevel(user);
 
-        if (user.getRating() > 0) {
-            user.setRating(user.getRating() - 1);
-            userProfileRegistry.updateUserProfile(user);
+        if (currentUser.getRating() > 0) {
+            currentUser.setRating(currentUser.getRating() - 1);
+            userProfileRegistry.updateUserProfile(currentUser);
 
             return new FinishGameResponse();
         }
@@ -90,6 +98,7 @@ public class ProfileService {
         finishGameResponse.errorCode = STATUS_ERROR;
         finishGameResponse.errorMessage = RATING_ERROR_MESSAGE;
 
+        userProfileRegistry.updateUserProfile(user);
         return finishGameResponse;
     }
 
@@ -109,8 +118,36 @@ public class ProfileService {
         return startGameResponse;
     }
 
-    private void profileLevelTransition(){
+    private UserProfile recalculateUserLevel(UserProfile user){
+        int level = user.getLevel();
+        int experience = user.getExperience();
+        int fullUserExperience = levelsConfig.get(level) + experience;
 
+        List<Integer> experienceThresholds = new ArrayList<>(levelsConfig.values());
+        List<Integer> userLevels = experienceThresholds.stream().filter(e -> e < fullUserExperience).collect(Collectors.toList());
+
+        int oldLevel = user.getLevel();
+        int achievedLevel = userLevels.get(userLevels.size() - 1);
+
+        if(oldLevel < achievedLevel){
+            getAwardForEachLevelReached(user, oldLevel, achievedLevel);
+        }
+
+        int updatedExperience = fullUserExperience - levelsConfig.get(achievedLevel);
+
+        user.setLevel(achievedLevel);
+        user.setExperience(updatedExperience);
+        userProfileRegistry.updateUserProfile(user);
+        return user;
+    }
+
+    private void getAwardForEachLevelReached(UserProfile user, int oldLevel, int achievedLevel) {
+        IntStream.rangeClosed(oldLevel, achievedLevel).forEach(i -> {
+            var award = levelUpAwardConfig.get(i);
+            user.setMoney(award.getMoney());
+            user.setEnergy(award.getEnergy());
+            award.getInventoryItems().forEach(item -> user.getInventory().add(item));
+        });
     }
 
 
