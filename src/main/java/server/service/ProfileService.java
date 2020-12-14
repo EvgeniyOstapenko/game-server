@@ -122,8 +122,8 @@ public class ProfileService {
         int experience = user.getExperience();
         int fullUserExperience = levelsConfig.get(userLevel) + experience;
 
-        List<Map.Entry<Integer, Integer>> userLevels = levelsConfig.entrySet().stream().filter(level -> level.getValue() <= fullUserExperience).collect(Collectors.toList());
-
+        List<Map.Entry<Integer, Integer>> userLevels = levelsConfig.entrySet()
+                .stream().filter(level -> level.getValue() <= fullUserExperience).collect(Collectors.toList());
 
         int achievedLevel = userLevels.get(userLevels.size() - 1).getKey();
 
@@ -142,18 +142,12 @@ public class ProfileService {
     private void getAwardForEachLevelReached(UserProfile user, int oldLevel, int achievedLevel) {
         IntStream.rangeClosed(oldLevel + 1, achievedLevel).forEach(i -> {
             var award = levelUpAwardConfig.get(i);
-            user.setMoney(award.getMoney());
-            user.setEnergy(award.getEnergy());
+            user.setMoney(user.getMoney() + award.getMoney());
+            user.setEnergy(user.getEnergy() + award.getEnergy());
 
             Optional<List<InventoryItem>> awardOptional = Optional.ofNullable(award.getInventoryItems());
-
-//            awardOptional.ifPresent().forEach(item -> user.getInventory().add(item));
-
             awardOptional.ifPresent(aw -> aw.forEach(item -> user.getInventory().add(item)));
 
-            if(award.getInventoryItems() != null) {
-                award.getInventoryItems().forEach(item -> user.getInventory().add(item));
-            }
         });
     }
 

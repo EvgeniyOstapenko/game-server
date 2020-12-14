@@ -121,9 +121,6 @@ public class ProfileTests extends ConnectAndLoginTests {
         assertSame(STATUS_OK, profile.getEnergy());
         assertSame(STATUS_ERROR, response.errorCode);
         assertEquals(ENERGY_ERROR_MESSAGE, response.errorMessage);
-
-
-//        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
     }
 
 
@@ -131,26 +128,25 @@ public class ProfileTests extends ConnectAndLoginTests {
     @Order(4)
     @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void recalculateUserLevelAndExperienceWithAwardTestShouldChangeUserExperienceLevelAndAward() {
-        successLoginTest();
+//        successLoginTest();
         //GIVEN
         FinishGameRequest finishGameRequest = new FinishGameRequest();
         finishGameRequest.setResult(GameResult.WIN);
 
         //WHEN
         when((messageUtil).isRequestDuplicate(finishGameRequest)).thenReturn(false);
-        IntStream.rangeClosed(1, 5).forEach(i -> {
+        IntStream.rangeClosed(1, 6).forEach(i -> {
             var startGameResponse = clientConnection.request(finishGameRequest, FinishGameResponse.class);
         });
 
 
         //THEN
         profile = profileService.selectUserProfile(TEST_PROFILE_ID);
-//        assertSame(STATUS_OK, profile.getEnergy());
-//        assertSame(STATUS_ERROR, response.errorCode);
-//        assertEquals(ENERGY_ERROR_MESSAGE, response.errorMessage);
-
-
-//        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
+        assertEquals(4, profile.getLevel());
+        assertEquals(10, profile.getExperience());
+        assertEquals(325, profile.getEnergy());
+        assertEquals(18, profile.getRating());
+        assertEquals(460, profile.getMoney());
     }
 
 }
