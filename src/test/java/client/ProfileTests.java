@@ -49,7 +49,7 @@ public class ProfileTests extends ConnectAndLoginTests {
     Integer STATUS_ERROR;
 
     @Test
-    @Order(1)
+//    @Order(1)
     @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void withdrawEnergyByStartGameTest() {
 //        successLoginTest();
@@ -102,7 +102,7 @@ public class ProfileTests extends ConnectAndLoginTests {
     }
 
     @Test
-    @Order(3)
+//    @Order(3)
     @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void withdrawEnergyByStartGameTestRequestShouldNotPassAndReturnErrorMessageAndEnergyEqualsZeroAndCodeError() {
 //        successLoginTest();
@@ -125,7 +125,7 @@ public class ProfileTests extends ConnectAndLoginTests {
 
 
     @Test
-    @Order(4)
+//    @Order(4)
     @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void recalculateUserLevelAndExperienceWithAwardTestShouldChangeUserExperienceLevelAndAward() {
 //        successLoginTest();
