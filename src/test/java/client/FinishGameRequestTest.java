@@ -17,15 +17,20 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 
 @SpringBootTest(classes = ServerApplication.class)
-//@TestPropertySource("/application-test.properties")
-@TestPropertySource(locations = { "/application-test.properties", "/application.properties" })
+@TestPropertySource(locations = { "/application-test.properties" })
 public class FinishGameRequestTest extends ConnectAndLoginTests {
 
     @Value("${duplicateFinishRequestsErrorMessage}")
-    String duplicateRequestsErrorMessage;
+    String DUPLICATE_REQUEST_ERROR_MESSAGE;
 
-    @Value("${ok}")
-    Integer ok;
+    @Value("${statusOk}")
+    Integer STATUS_OK;
+
+    @Value("${statusError}")
+    Integer STATUS_ERROR;
+
+    @Value("${ratingErrorMessage}")
+    String RATING_ERROR_MESSAGE;
 
     @Test
     @Order(1)
@@ -40,7 +45,7 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
         FinishGameResponse response = clientConnection.request(finishGameRequest, FinishGameResponse.class);
 
         //THEN
-        assertSame(ok, response.errorCode);
+        assertSame(STATUS_OK, response.errorCode);
 
         //AFTER
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
@@ -49,8 +54,8 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
 
     @Test
     @Order(2)
-    public void onMessageTestWithDuplicateStartInTheRowGameRequestShouldReturnErrorResponse() {
-//        successLoginTest();
+    public void onMessageTestWithNotEnoughRatingToProceedShouldReturnErrorResponse() {
+        successLoginTest();
 
         //GIVEN
         FinishGameRequest defeatGameFinishRequest = new FinishGameRequest();
@@ -60,8 +65,8 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
         FinishGameResponse response = clientConnection.request(defeatGameFinishRequest, FinishGameResponse.class);
 
         //THEN
-        assertSame(1, response.errorCode);
-        assertEquals("Not enough rating!", response.errorMessage);
+        assertSame(STATUS_ERROR, response.errorCode);
+        assertEquals(RATING_ERROR_MESSAGE, response.errorMessage);
 
         //AFTER
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
@@ -70,8 +75,8 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
 
     @Test
     @Order(3)
-    public void onMessageTestWithDuplicateStartInTheRowGameRequestShouldReturnErrorResponse2() {
-        successLoginTest();
+    public void onMessageTestWithDuplicateStartInTheRowGameRequestShouldReturnErrorResponse() {
+//        successLoginTest();
 
         //GIVEN
         FinishGameRequest defeatGameFinishRequest = new FinishGameRequest();
@@ -82,8 +87,8 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
         FinishGameResponse response = clientConnection.request(defeatGameFinishRequest, FinishGameResponse.class);
 
         //THEN
-        assertSame(2, response.errorCode);
-        assertEquals(duplicateRequestsErrorMessage, response.errorMessage);
+        assertSame(STATUS_ERROR, response.errorCode);
+        assertEquals(DUPLICATE_REQUEST_ERROR_MESSAGE, response.errorMessage);
 
         //AFTER
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);

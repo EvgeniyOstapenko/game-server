@@ -9,6 +9,7 @@ import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import platform.domain.IUser;
 import platform.messages.ILogin;
@@ -43,6 +44,9 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     @Resource
     private SessionMap sessionMap;
+
+    @Value("${statusError}")
+    Integer STATUS_ERROR;
 
     private Map<Channel, Session> openConnections = new ConcurrentHashMap<>();
 
@@ -126,7 +130,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
         var response = messageController.onMessage(message, profile);
         AbstractResponse errorResponse = (AbstractResponse)response;
-        errorResponse.errorCode = 2;
+        errorResponse.errorCode = STATUS_ERROR;
         errorResponse.errorMessage = errorMessage;
 
         return response;

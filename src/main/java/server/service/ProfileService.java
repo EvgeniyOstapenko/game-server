@@ -40,6 +40,9 @@ public class ProfileService {
     @Value("${energyErrorMessage}")
     String ENERGY_ERROR_MESSAGE;
 
+    @Value("${statusError}")
+    Integer STATUS_ERROR;
+
     public UserProfile findUserProfileOrCreateNew(String uid) {
         var profile = userProfileRegistry.findUserProfileByUid(uid);
         if (profile == null) {
@@ -76,7 +79,7 @@ public class ProfileService {
         UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
         user.setExperience(user.getExperience() + 3);
 
-        if (user.getRating() >= 0) {
+        if (user.getRating() > 0) {
             user.setRating(user.getRating() - 1);
             userProfileRegistry.updateUserProfile(user);
 
@@ -84,7 +87,7 @@ public class ProfileService {
         }
 
         var finishGameResponse = new FinishGameResponse();
-        finishGameResponse.errorCode = 1;
+        finishGameResponse.errorCode = STATUS_ERROR;
         finishGameResponse.errorMessage = RATING_ERROR_MESSAGE;
 
         return finishGameResponse;
@@ -100,7 +103,7 @@ public class ProfileService {
         }
 
         var startGameResponse = new StartGameResponse();
-        startGameResponse.errorCode = 1;
+        startGameResponse.errorCode = STATUS_ERROR;
         startGameResponse.errorMessage = ENERGY_ERROR_MESSAGE;
 
         return startGameResponse;

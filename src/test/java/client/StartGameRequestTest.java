@@ -1,7 +1,5 @@
 package client;
 
-import common.messages.FinishGameRequest;
-import common.messages.FinishGameResponse;
 import common.messages.StartGameRequest;
 import common.messages.StartGameResponse;
 import org.junit.jupiter.api.Order;
@@ -19,7 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 public class StartGameRequestTest extends ConnectAndLoginTests {
 
     @Value("${duplicateStartRequestsErrorMessage}")
-    String duplicateRequestsErrorMessage;
+    String DUPLICATE_REQUEST_ERROR_MESSAGE;
+
+    @Value("${statusOk}")
+    Integer STATUS_OK;
+
+    @Value("${statusError}")
+    Integer STATUS_ERROR;
 
     @Test
     @Order(1)
@@ -37,8 +41,8 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
 
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
         StartGameResponse response = clientConnection.request(new StartGameRequest(), StartGameResponse.class);
-        assertSame(2, response.errorCode);
-        assertEquals(duplicateRequestsErrorMessage, response.errorMessage);
+        assertSame(STATUS_ERROR, response.errorCode);
+        assertEquals(DUPLICATE_REQUEST_ERROR_MESSAGE, response.errorMessage);
 
 //        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
     }

@@ -36,11 +36,17 @@ public class ProfileTests extends ConnectAndLoginTests {
 
     private UserProfile profile;
 
-    @Value("${errorMessage}")
-    String errorMessage;
+    @Value("${energyErrorMessage}")
+    String ENERGY_ERROR_MESSAGE;
 
     @Value("${testProfileId}")
     Integer TEST_PROFILE_ID;
+
+    @Value("${statusOk}")
+    Integer STATUS_OK;
+
+    @Value("${statusError}")
+    Integer STATUS_ERROR;
 
     @Test
     @Order(1)
@@ -54,10 +60,10 @@ public class ProfileTests extends ConnectAndLoginTests {
 
         IntStream.rangeClosed(1, 5).forEach(i -> {
             var startGameResponse = request(new StartGameRequest(), StartGameResponse.class);
-            assertSame(0, startGameResponse.errorCode);
+            assertSame(STATUS_OK, startGameResponse.errorCode);
         });
         var startGameResponse = request(new StartGameRequest(), StartGameResponse.class);
-        assertSame(1, startGameResponse.errorCode);
+        assertSame(STATUS_ERROR, startGameResponse.errorCode);
     }
 
     // mock method
@@ -68,8 +74,8 @@ public class ProfileTests extends ConnectAndLoginTests {
             return new StartGameResponse();
         } else {
             var startGameResponse = new StartGameResponse();
-            startGameResponse.errorCode = 1;
-            startGameResponse.errorMessage = errorMessage;
+            startGameResponse.errorCode = STATUS_ERROR;
+            startGameResponse.errorMessage = ENERGY_ERROR_MESSAGE;
 
             return startGameResponse;
         }
@@ -87,7 +93,7 @@ public class ProfileTests extends ConnectAndLoginTests {
         //THEN
         profile = profileService.selectUserProfile(TEST_PROFILE_ID);
         assertSame(20, profile.getEnergy());
-        assertSame(0, response.errorCode);
+        assertSame(STATUS_OK, response.errorCode);
 
 
         FinishGameRequest finishGameRequest = new FinishGameRequest();
@@ -98,7 +104,7 @@ public class ProfileTests extends ConnectAndLoginTests {
     @Test
     @Order(3)
     @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    public void withdrawEnergyByStartGameTestRequestShouldNotPassAndReturnErrorMessageAndEnergyEqualZeroAndCodeError() {
+    public void withdrawEnergyByStartGameTestRequestShouldNotPassAndReturnErrorMessageAndEnergyEqualsZeroAndCodeError() {
 //        successLoginTest();
         StartGameRequest startGameRequest = new StartGameRequest();
 
@@ -112,9 +118,9 @@ public class ProfileTests extends ConnectAndLoginTests {
 
         //THEN
         profile = profileService.selectUserProfile(TEST_PROFILE_ID);
-        assertSame(0, profile.getEnergy());
-        assertSame(1, response.errorCode);
-        assertEquals(errorMessage, response.errorMessage);
+        assertSame(STATUS_OK, profile.getEnergy());
+        assertSame(STATUS_ERROR, response.errorCode);
+        assertEquals(ENERGY_ERROR_MESSAGE, response.errorMessage);
 
 
 //        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
