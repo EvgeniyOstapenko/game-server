@@ -11,12 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.test.context.TestPropertySource;
 import platform.service.UserProfileRegistry;
 import server.common.GameResult;
+import server.domain.InventoryItem;
 import server.domain.UserProfile;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -119,18 +118,17 @@ public class ProfileService {
     }
 
     private UserProfile recalculateUserLevel(UserProfile user){
-        int level = user.getLevel();
+        int userLevel = user.getLevel();
         int experience = user.getExperience();
-        int fullUserExperience = levelsConfig.get(level) + experience;
+        int fullUserExperience = levelsConfig.get(userLevel) + experience;
 
-        List<Integer> experienceThresholds = new ArrayList<>(levelsConfig.values());
-        List<Integer> userLevels = experienceThresholds.stream().filter(e -> e < fullUserExperience).collect(Collectors.toList());
+        List<Map.Entry<Integer, Integer>> userLevels = levelsConfig.entrySet().stream().filter(level -> level.getValue() <= fullUserExperience).collect(Collectors.toList());
 
-        int oldLevel = user.getLevel();
-        int achievedLevel = userLevels.get(userLevels.size() - 1);
 
-        if(oldLevel < achievedLevel){
-            getAwardForEachLevelReached(user, oldLevel, achievedLevel);
+        int achievedLevel = userLevels.get(userLevels.size() - 1).getKey();
+
+        if(userLevel < achievedLevel){
+            getAwardForEachLevelReached(user, userLevel, achievedLevel);
         }
 
         int updatedExperience = fullUserExperience - levelsConfig.get(achievedLevel);
@@ -142,11 +140,20 @@ public class ProfileService {
     }
 
     private void getAwardForEachLevelReached(UserProfile user, int oldLevel, int achievedLevel) {
-        IntStream.rangeClosed(oldLevel, achievedLevel).forEach(i -> {
+        IntStream.rangeClosed(oldLevel + 1, achievedLevel).forEach(i -> {
             var award = levelUpAwardConfig.get(i);
             user.setMoney(award.getMoney());
             user.setEnergy(award.getEnergy());
-            award.getInventoryItems().forEach(item -> user.getInventory().add(item));
+
+            Optional<List<InventoryItem>> awardOptional = Optional.ofNullable(award.getInventoryItems());
+
+//            awardOptional.ifPresent().forEach(item -> user.getInventory().add(item));
+
+            awardOptional.ifPresent(aw -> aw.forEach(item -> user.getInventory().add(item)));
+
+            if(award.getInventoryItems() != null) {
+                award.getInventoryItems().forEach(item -> user.getInventory().add(item));
+            }
         });
     }
 

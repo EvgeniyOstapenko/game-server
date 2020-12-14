@@ -126,4 +126,31 @@ public class ProfileTests extends ConnectAndLoginTests {
 //        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
     }
 
+
+    @Test
+    @Order(4)
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void recalculateUserLevelAndExperienceWithAwardTestShouldChangeUserExperienceLevelAndAward() {
+        successLoginTest();
+        //GIVEN
+        FinishGameRequest finishGameRequest = new FinishGameRequest();
+        finishGameRequest.setResult(GameResult.WIN);
+
+        //WHEN
+        when((messageUtil).isRequestDuplicate(finishGameRequest)).thenReturn(false);
+        IntStream.rangeClosed(1, 5).forEach(i -> {
+            var startGameResponse = clientConnection.request(finishGameRequest, FinishGameResponse.class);
+        });
+
+
+        //THEN
+        profile = profileService.selectUserProfile(TEST_PROFILE_ID);
+//        assertSame(STATUS_OK, profile.getEnergy());
+//        assertSame(STATUS_ERROR, response.errorCode);
+//        assertEquals(ENERGY_ERROR_MESSAGE, response.errorMessage);
+
+
+//        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
+    }
+
 }
