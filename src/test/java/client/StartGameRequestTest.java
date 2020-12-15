@@ -46,8 +46,5 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
         //THEN
         assertSame(STATUS_ERROR, response.errorCode);
         assertEquals(DUPLICATE_REQUEST_ERROR_MESSAGE, response.errorMessage);
-
-        //AFTER
-//        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
     }
 }

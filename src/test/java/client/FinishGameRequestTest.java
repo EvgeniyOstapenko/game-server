@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import server.ServerApplication;
 import server.common.GameResult;
 
@@ -41,13 +42,11 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
         finishGameRequest.setResult(GameResult.WIN);
 
         //WHEN
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
         FinishGameResponse response = clientConnection.request(finishGameRequest, FinishGameResponse.class);
 
         //THEN
         assertSame(STATUS_OK, response.errorCode);
-
-        //AFTER
-        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
     }
 
 
@@ -60,14 +59,12 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
         defeatGameFinishRequest.setResult(GameResult.DEFEAT);
 
         //WHEN
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
         FinishGameResponse response = clientConnection.request(defeatGameFinishRequest, FinishGameResponse.class);
 
         //THEN
         assertSame(STATUS_ERROR, response.errorCode);
         assertEquals(RATING_ERROR_MESSAGE, response.errorMessage);
-
-        //AFTER
-        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
     }
 
 
@@ -80,12 +77,31 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
         defeatGameFinishRequest.setResult(GameResult.DEFEAT);
 
         //WHEN
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
         clientConnection.request(defeatGameFinishRequest, FinishGameResponse.class);
         FinishGameResponse response = clientConnection.request(defeatGameFinishRequest, FinishGameResponse.class);
 
         //THEN
         assertSame(STATUS_ERROR, response.errorCode);
         assertEquals(DUPLICATE_REQUEST_ERROR_MESSAGE, response.errorMessage);
+    }
+
+    @Test
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void onMessageTestForUserAwardReturnShouldReturnResponseWithUserAward() {
+        successLoginTest();
+
+        //GIVEN
+        FinishGameRequest defeatGameFinishRequest = new FinishGameRequest();
+        defeatGameFinishRequest.setResult(GameResult.WIN);
+
+        //WHEN
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+        FinishGameResponse response = clientConnection.request(defeatGameFinishRequest, FinishGameResponse.class);
+
+        //THEN
+        assertSame(STATUS_OK, response.errorCode);
+        assertSame(20, response.award.getEnergy());
 
         //AFTER
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);

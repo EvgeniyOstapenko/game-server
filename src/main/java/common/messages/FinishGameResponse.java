@@ -25,4 +25,7 @@ public class FinishGameResponse extends AbstractResponse{
         return "FinishGameResponse{}";
     }
 
+    public AwardStructure getAward() {
+        return award;
+    }
 }
