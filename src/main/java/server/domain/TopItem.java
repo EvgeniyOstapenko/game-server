@@ -1,7 +1,5 @@
 package server.domain;
 
-import java.util.*;
-
 public class TopItem {
 
     public int profileId;
@@ -10,6 +8,8 @@ public class TopItem {
 
     public int rating;
 
+    public TopItem() {
+    }
 
     public TopItem(int profileId, String profileName, int rating) {
         this.profileId = profileId;
