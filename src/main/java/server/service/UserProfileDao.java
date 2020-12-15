@@ -1,5 +1,6 @@
 package server.service;
 
+import common.dto.UserProfileStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import platform.service.UserProfileRegistry;
 import server.domain.BackpackItem;
 import server.domain.InventoryItem;
 import server.domain.UserProfile;
-import common.dto.UserProfileStructure;
 
 import javax.annotation.Resource;
 import java.sql.ResultSet;
@@ -56,7 +56,7 @@ public class UserProfileDao implements UserProfileRegistry {
                         "money", userProfile.getMoney(),
                         "backpack", Arrays.stream(userProfile.getBackpack()).map(Object::toString).collect(Collectors.joining(" ")),
                         "inventory", Arrays.stream(userProfile.getInventory()).map(Object::toString).collect(Collectors.joining(" ")),
-                        "friends",  Arrays.stream(userProfile.getFriends()).map(Object::toString).collect(Collectors.joining(" "))
+                        "friends", Arrays.stream(userProfile.getFriends()).map(Object::toString).collect(Collectors.joining(" "))
                 )
         );
 
@@ -129,5 +129,4 @@ public class UserProfileDao implements UserProfileRegistry {
                 "friends", userProfile.getFriends().stream().map(String::valueOf).collect(Collectors.joining(","))
         ));
     }
-
 }
