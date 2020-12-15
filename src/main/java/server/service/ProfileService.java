@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.TestPropertySource;
+import platform.domain.IUser;
 import platform.service.UserProfileRegistry;
 import server.common.GameResult;
 import server.domain.InventoryItem;
-import server.domain.TopItem;
 import server.domain.UserProfile;
 
 import javax.annotation.Resource;
@@ -31,7 +31,7 @@ public class ProfileService {
     private UserProfileRegistry userProfileRegistry;
 
     @Autowired
-    private TopService topService;
+    private TopRequestService topRequestService;
 
     @Value("#{levelsConfig}")
     private Map<Integer, Integer> levelsConfig;
@@ -83,7 +83,8 @@ public class ProfileService {
         currentUser.setRating(currentUser.getRating() + 3);
         userProfileRegistry.updateUserProfile(currentUser);
 
-        return new FinishGameResponse();
+        AwardStructure userAward = getUserAward(userId);
+        return new FinishGameResponse(userAward);
     }
 
     private FinishGameResponse takeLosingActions(Integer userId) {
@@ -91,14 +92,16 @@ public class ProfileService {
         user.setExperience(user.getExperience() + 3);
         UserProfile currentUser = recalculateUserLevel(user);
 
+        AwardStructure userAward = getUserAward(userId);
+
         if (currentUser.getRating() > 0) {
             currentUser.setRating(currentUser.getRating() - 1);
             userProfileRegistry.updateUserProfile(currentUser);
 
-            return new FinishGameResponse();
+            return new FinishGameResponse(userAward);
         }
 
-        var finishGameResponse = new FinishGameResponse();
+        var finishGameResponse = new FinishGameResponse(userAward);
         finishGameResponse.errorCode = STATUS_ERROR;
         finishGameResponse.errorMessage = RATING_ERROR_MESSAGE;
 
@@ -156,5 +159,14 @@ public class ProfileService {
         });
     }
 
+    private AwardStructure getUserAward(Integer userId){
+        UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
+        AwardStructure userAward = new AwardStructure();
+        userAward.setEnergy(user.getEnergy());
+        userAward.setEnergy(user.getEnergy());
+        userAward.setInventoryItems(user.getInventory());
+
+        return userAward;
+    }
 
 }

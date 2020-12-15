@@ -11,9 +11,13 @@ public class FinishGameResponse extends AbstractResponse{
     public FinishGameResponse() {
     }
 
-    public FinishGameResponse(int errorCode, String errorMessage) {
+    public FinishGameResponse(AwardStructure award) {
+        this.award = award;
+    }
+
+    public FinishGameResponse(int errorCode, String errorMessage, AwardStructure award) {
         super(errorCode, errorMessage);
-//        this.award = award;
+        this.award = award;
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class TopService {
+public class TopRequestService {
 
     private List<TopItem> topList;
 
@@ -22,11 +22,12 @@ public class TopService {
     Integer NUMBER_OF_TOP_PLAYERS;
 
 
-    public void onRatingChange(UserProfile profile) {
+    public void onRatingChange() {
         topList = getTopUserListFromDB();
     }
 
     public List<TopItem> getTopList() {
+        onRatingChange();
         return topList;
     }
 
