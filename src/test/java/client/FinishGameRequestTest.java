@@ -4,7 +4,6 @@ import common.messages.FinishGameRequest;
 import common.messages.FinishGameResponse;
 import common.messages.StartGameRequest;
 import common.messages.StartGameResponse;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 
 @SpringBootTest(classes = ServerApplication.class)
-@TestPropertySource(locations = { "/application-test.properties" })
+@TestPropertySource(locations = {"/application-test.properties"})
 public class FinishGameRequestTest extends ConnectAndLoginTests {
 
     @Value("${duplicateFinishRequestsErrorMessage}")

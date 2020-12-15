@@ -1,21 +1,20 @@
 package client;
 
-import common.messages.*;
-import org.junit.jupiter.api.Order;
+import common.messages.TopRequest;
+import common.messages.TopResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import server.ServerApplication;
-import server.common.GameResult;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 @SpringBootTest(classes = ServerApplication.class)
 @TestPropertySource("/application-test.properties")
-public class TopRequestTest  extends ConnectAndLoginTests {
+public class TopRequestTest extends ConnectAndLoginTests {
 
     @Value("${statusOk}")
     Integer STATUS_OK;

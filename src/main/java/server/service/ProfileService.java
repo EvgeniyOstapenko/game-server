@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.TestPropertySource;
 import platform.service.UserProfileRegistry;
+import platform.session.Session;
+import platform.session.SessionMap;
 import server.common.GameResult;
 import server.domain.InventoryItem;
 import server.domain.UserProfile;
 
 import javax.annotation.Resource;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -35,8 +38,11 @@ public class ProfileService {
     @Autowired
     private TopRequestService topRequestService;
 
+//    @Autowired
+//    private EnterAccount enterAccount;
+
     @Autowired
-    private EnterAccount enterAccount;
+    private SessionMap sessionMap;
 
     @Value("#{levelsConfig}")
     private Map<Integer, Integer> levelsConfig;
@@ -55,6 +61,9 @@ public class ProfileService {
 
     @Value("${statusError}")
     Integer STATUS_ERROR;
+
+    @Value("${statusOk}")
+    Integer STATUS_OK;
 
     public UserProfile findUserProfileOrCreateNew(String uid) {
         var profile = userProfileRegistry.findUserProfileByUid(uid);
@@ -84,18 +93,22 @@ public class ProfileService {
     }
 
     private ChangeUserNameResponse changeUserName(Integer userId) {
-        long enterAccountTime = enterAccount.serverTime;
-        long currentTime = System.currentTimeMillis();
+        ChangeUserNameResponse changeUserNameResponse = new ChangeUserNameResponse();
 
-        LocalDateTime enterAccountDateTime
-                = LocalDateTime.ofInstant(Instant.ofEpochMilli(enterAccountTime), ZoneId.systemDefault());
-        LocalDateTime currentDateTime
-                = LocalDateTime.ofInstant(Instant.ofEpochMilli(enterAccountTime), ZoneId.systemDefault());
+        Session sessionByProfileId = sessionMap.getSessionByProfileId(userId);
+        LocalDateTime createdTime = sessionByProfileId.createdAt;
 
-
+        LocalDate currentTime = LocalDate.now();
+        LocalDate localDate = createdTime.toLocalDate();
 
 
-        return null;
+        if(currentTime.equals(localDate)){
+            changeUserNameResponse.errorCode = STATUS_ERROR;
+            changeUserNameResponse.errorMessage = "User can change name only once for a day";
+        }
+
+
+        return changeUserNameResponse;
     }
 
 

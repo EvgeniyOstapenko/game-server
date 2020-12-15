@@ -1,7 +1,9 @@
 package common.messages;
 
 import common.dto.UserProfileStructure;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EnterAccount {
 
     public UserProfileStructure userProfile;
