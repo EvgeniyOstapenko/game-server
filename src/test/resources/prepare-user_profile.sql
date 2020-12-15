@@ -1,5 +1,6 @@
 delete from user_profile;
 
+update user_profile set energy = 25, money = 100, rating = 0, experience = 0 where id = 1;
 insert into user_profile (id, name, level, experience, energy, rating, money, backpack, inventory, friends) values (1, '', 1, 0, 25, 0, 100, '', '', '');
 insert into user_profile (id, name, level, experience, energy, rating, money, backpack, inventory, friends) values (2, 'man11', 1, 0, 25, 10, 100, '', '', '');
 insert into user_profile (id, name, level, experience, energy, rating, money, backpack, inventory, friends) values (3, 'nikname21', 1, 0, 25, 100, 100, '', '', '');
