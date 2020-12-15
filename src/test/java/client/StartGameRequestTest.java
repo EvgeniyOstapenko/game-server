@@ -39,11 +39,15 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
     public void onMessageTestWithDuplicateStartInTheRowGameRequestShouldReturnErrorResponse() {
 //        successLoginTest();
 
+        //WHEN
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
         StartGameResponse response = clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+
+        //THEN
         assertSame(STATUS_ERROR, response.errorCode);
         assertEquals(DUPLICATE_REQUEST_ERROR_MESSAGE, response.errorMessage);
 
+        //AFTER
 //        clientConnection.request(new FinishGameRequest(), FinishGameResponse.class);
     }
 }

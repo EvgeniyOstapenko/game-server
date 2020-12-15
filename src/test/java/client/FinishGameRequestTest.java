@@ -33,7 +33,6 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
     String RATING_ERROR_MESSAGE;
 
     @Test
-    @Order(1)
     public void start() throws Exception {
 //        successLoginTest();
 
@@ -53,7 +52,6 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
 
 
     @Test
-    @Order(2)
     public void onMessageTestWithNotEnoughRatingToProceedShouldReturnErrorResponse() {
         successLoginTest();
 
@@ -74,7 +72,6 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
 
 
     @Test
-    @Order(3)
     public void onMessageTestWithDuplicateStartInTheRowGameRequestShouldReturnErrorResponse() {
 //        successLoginTest();
 

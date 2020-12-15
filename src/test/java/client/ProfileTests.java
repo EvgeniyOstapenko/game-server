@@ -26,8 +26,6 @@ import static org.mockito.Mockito.when;
 
  @SpringBootTest(classes = ServerApplication.class)
 @TestPropertySource("/application-test.properties")
-@Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
- @Sql(value = {"/after-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class ProfileTests extends ConnectAndLoginTests {
 
     @Resource
@@ -51,8 +49,7 @@ public class ProfileTests extends ConnectAndLoginTests {
     Integer STATUS_ERROR;
 
     @Test
-//    @Order(1)
-//    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void withdrawEnergyByStartGameTest() {
 //        successLoginTest();
         profile = profileService.selectUserProfile(TEST_PROFILE_ID);
@@ -84,8 +81,7 @@ public class ProfileTests extends ConnectAndLoginTests {
     }
 
     @Test
-//    @Order(2)
-//    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void withdrawEnergyByStartGameTestWithRealRequestShouldPassAndEnergyBeChangedInUserProfileDataBase() {
         successLoginTest();
 
@@ -104,8 +100,7 @@ public class ProfileTests extends ConnectAndLoginTests {
     }
 
     @Test
-//    @Order(3)
-//    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void withdrawEnergyByStartGameTestRequestShouldNotPassAndReturnErrorMessageAndEnergyEqualsZeroAndCodeError() {
 //        successLoginTest();
         StartGameRequest startGameRequest = new StartGameRequest();
@@ -127,8 +122,7 @@ public class ProfileTests extends ConnectAndLoginTests {
 
 
     @Test
-//    @Order(4)
-//    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void recalculateUserLevelAndExperienceWithAwardTestShouldChangeUserExperienceLevelAndAward() {
 //        successLoginTest();
         //GIVEN

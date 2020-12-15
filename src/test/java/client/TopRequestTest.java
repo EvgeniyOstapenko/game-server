@@ -23,6 +23,9 @@ public class TopRequestTest  extends ConnectAndLoginTests {
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
+    @Value("${numberOfTopPlayers}")
+    Integer NUMBER_OF_PLAYERS;
+
     @Test
     public void start() throws Exception {
         successLoginTest();
@@ -36,7 +39,8 @@ public class TopRequestTest  extends ConnectAndLoginTests {
     }
 
     @Test
-    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = {"/toFill-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = {"/toClean-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void onMessageTestRequestToGetTopUserListShouldReturnTopUsersList() {
         successLoginTest();
 
@@ -45,8 +49,7 @@ public class TopRequestTest  extends ConnectAndLoginTests {
 
         //THEN
         assertSame(STATUS_OK, response.errorCode);
-//        assertEquals(RATING_ERROR_MESSAGE, response.errorMessage);
-
+        assertEquals(NUMBER_OF_PLAYERS, response.topList.size());
     }
 
 
