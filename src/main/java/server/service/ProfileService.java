@@ -1,23 +1,25 @@
 package server.service;
 
 import common.dto.AwardStructure;
-import common.messages.FinishGameRequest;
-import common.messages.FinishGameResponse;
-import common.messages.StartGameResponse;
+import common.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.TestPropertySource;
-import platform.domain.IUser;
 import platform.service.UserProfileRegistry;
 import server.common.GameResult;
 import server.domain.InventoryItem;
 import server.domain.UserProfile;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -32,6 +34,9 @@ public class ProfileService {
 
     @Autowired
     private TopRequestService topRequestService;
+
+    @Autowired
+    private EnterAccount enterAccount;
 
     @Value("#{levelsConfig}")
     private Map<Integer, Integer> levelsConfig;
@@ -73,6 +78,26 @@ public class ProfileService {
         }
         return takeLosingActions(userId);
     }
+
+    public ChangeUserNameResponse getChangeUserNameResponse(Integer userId) {
+        return changeUserName(userId);
+    }
+
+    private ChangeUserNameResponse changeUserName(Integer userId) {
+        long enterAccountTime = enterAccount.serverTime;
+        long currentTime = System.currentTimeMillis();
+
+        LocalDateTime enterAccountDateTime
+                = LocalDateTime.ofInstant(Instant.ofEpochMilli(enterAccountTime), ZoneId.systemDefault());
+        LocalDateTime currentDateTime
+                = LocalDateTime.ofInstant(Instant.ofEpochMilli(enterAccountTime), ZoneId.systemDefault());
+
+
+
+
+        return null;
+    }
+
 
     private FinishGameResponse takeWinningActions(Integer userId) {
         UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
@@ -125,7 +150,7 @@ public class ProfileService {
         return startGameResponse;
     }
 
-    private UserProfile recalculateUserLevel(UserProfile user){
+    private UserProfile recalculateUserLevel(UserProfile user) {
         int userLevel = user.getLevel();
         int experience = user.getExperience();
         int fullUserExperience = levelsConfig.get(userLevel) + experience;
@@ -135,7 +160,7 @@ public class ProfileService {
 
         int achievedLevel = userLevels.get(userLevels.size() - 1).getKey();
 
-        if(userLevel < achievedLevel){
+        if (userLevel < achievedLevel) {
             getAwardForEachLevelReached(user, userLevel, achievedLevel);
         }
 
@@ -159,7 +184,7 @@ public class ProfileService {
         });
     }
 
-    private AwardStructure getUserAward(Integer userId){
+    private AwardStructure getUserAward(Integer userId) {
         UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
         AwardStructure userAward = new AwardStructure();
         userAward.setEnergy(user.getEnergy());

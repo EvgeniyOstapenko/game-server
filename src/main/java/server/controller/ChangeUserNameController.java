@@ -1,0 +1,28 @@
+package server.controller;
+
+import common.messages.ChangeUserNameRequest;
+import common.messages.StartGameRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import platform.service.MessageController;
+import server.domain.UserProfile;
+import server.service.ProfileService;
+
+public class ChangeUserNameController implements MessageController<ChangeUserNameRequest, UserProfile> {
+
+    ProfileService profileService;
+
+    @Autowired
+    public ChangeUserNameController(ProfileService profileService) {
+        this.profileService = profileService;
+    }
+
+    @Override
+    public Object onMessage(ChangeUserNameRequest changeUserNameRequest, UserProfile userProfile) {
+        return null;
+    }
+
+    @Override
+    public Class<ChangeUserNameRequest> messageClass() {
+        return ChangeUserNameRequest.class;
+    }
+}
