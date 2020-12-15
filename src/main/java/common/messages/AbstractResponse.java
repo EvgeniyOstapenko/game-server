@@ -1,7 +1,5 @@
 package common.messages;
 
-import java.util.*;
-
 public abstract class AbstractResponse {
 
     public int errorCode;

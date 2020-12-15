@@ -1,7 +1,6 @@
 package server.controller;
 
 import common.messages.FinishGameRequest;
-import common.messages.FinishGameResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

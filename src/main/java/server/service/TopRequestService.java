@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import server.domain.TopItem;
-import server.domain.UserProfile;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +43,7 @@ public class TopRequestService {
         return convertToTopItemList(topPlayers);
     }
 
-    private List<TopItem> convertToTopItemList(List<Map<String, Object>> mapList){
+    private List<TopItem> convertToTopItemList(List<Map<String, Object>> mapList) {
         return mapList.stream()
                 .map(map -> new TopItem((int) map.get("id"), (String) map.get("name"), (int) map.get("rating")))
                 .collect(Collectors.toList());

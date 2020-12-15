@@ -2,10 +2,12 @@ package platform.connection;
 
 import common.exception.DuplicateMessageStateException;
 import common.messages.AbstractResponse;
-import common.messages.StartGameResponse;
 import common.util.KeyValue;
 import common.util.MessageUtil;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,17 +121,17 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private Object getResponseMessage(Object message, MessageController messageController, Channel channel){
+    private Object getResponseMessage(Object message, MessageController messageController, Channel channel) {
         IUser profile = openConnections.get(channel).profile;
 
-        if(!messageUtil.isRequestDuplicate(message)){
+        if (!messageUtil.isRequestDuplicate(message)) {
             return messageController.onMessage(message, profile);
         }
 
         String errorMessage = toLogException(message);
 
         var response = messageController.onMessage(message, profile);
-        AbstractResponse errorResponse = (AbstractResponse)response;
+        AbstractResponse errorResponse = (AbstractResponse) response;
         errorResponse.errorCode = STATUS_ERROR;
         errorResponse.errorMessage = errorMessage;
 

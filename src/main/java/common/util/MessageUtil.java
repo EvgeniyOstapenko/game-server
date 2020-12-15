@@ -1,8 +1,6 @@
 package common.util;
 
 import common.exception.DuplicateMessageStateException;
-import common.messages.FinishGameResponse;
-import common.messages.StartGameResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
