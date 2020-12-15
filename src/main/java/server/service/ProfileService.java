@@ -6,12 +6,14 @@ import common.messages.FinishGameResponse;
 import common.messages.StartGameResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.TestPropertySource;
 import platform.service.UserProfileRegistry;
 import server.common.GameResult;
 import server.domain.InventoryItem;
+import server.domain.TopItem;
 import server.domain.UserProfile;
 
 import javax.annotation.Resource;
@@ -27,6 +29,9 @@ public class ProfileService {
 
     @Resource
     private UserProfileRegistry userProfileRegistry;
+
+    @Autowired
+    private TopService topService;
 
     @Value("#{levelsConfig}")
     private Map<Integer, Integer> levelsConfig;

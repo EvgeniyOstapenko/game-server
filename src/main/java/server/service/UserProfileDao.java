@@ -4,6 +4,7 @@ import common.dto.UserProfileStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,9 @@ public class UserProfileDao implements UserProfileRegistry {
 
     @Autowired
     private UserProfileStructure userProfile;
+
+    @Value("${numberOfTopPlayers}")
+    Integer NUMBER_OF_TOP_PLAYERS;
 
     @Override
     public IUser createNewUserProfile(String uid) {

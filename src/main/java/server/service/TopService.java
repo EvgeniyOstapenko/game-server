@@ -1,6 +1,5 @@
 package server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -9,6 +8,7 @@ import server.domain.UserProfile;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TopService {
@@ -23,31 +23,28 @@ public class TopService {
 
 
     public void onRatingChange(UserProfile profile) {
-        //toto update topList
-        List<Map<String, Object>> topPlayers = namedParameterJdbcTemplate
-                .queryForList("select user_profile id," +
-                                " user_profile.\"name\" ," +
-                                " user_profile.rating " +
-                                "from user_profile" +
-                                " order by rating desc limit :NUMBER_OF_TOP_PLAYERS",
-                        Map.of("NUMBER_OF_TOP_PLAYERS", NUMBER_OF_TOP_PLAYERS));
+        topList = getTopUserListFromDB();
     }
 
     public List<TopItem> getTopList() {
-        //todo return TOP 10 items
-
         return topList;
     }
 
-    public List<Map<String, Object>> get() {
+    private List<TopItem> getTopUserListFromDB() {
         List<Map<String, Object>> topPlayers = namedParameterJdbcTemplate
-                .queryForList("select user_profile id," +
+                .queryForList("select user_profile.id," +
                                 " user_profile.\"name\" ," +
                                 " user_profile.rating " +
                                 "from user_profile" +
                                 " order by rating desc limit :NUMBER_OF_TOP_PLAYERS",
                         Map.of("NUMBER_OF_TOP_PLAYERS", NUMBER_OF_TOP_PLAYERS));
-        return topPlayers;
+
+        return convertToTopItemList(topPlayers);
     }
 
+    private List<TopItem> convertToTopItemList(List<Map<String, Object>> mapList){
+        return mapList.stream()
+                .map(map -> new TopItem((int) map.get("id"), (String) map.get("name"), (int) map.get("rating")))
+                .collect(Collectors.toList());
+    }
 }

@@ -29,8 +29,7 @@ public class TopRequestController implements MessageController<TopRequest, UserP
     @Override
     public Object onMessage(TopRequest startGameRequest, UserProfile userProfile) {
         topService.onRatingChange(userProfile);
-        List<TopItem> topList = topService.getTopList();
-        return new TopResponse();
+        return new TopResponse(topService.getTopList());
 
     }
 
