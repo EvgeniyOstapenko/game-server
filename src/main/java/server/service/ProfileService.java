@@ -1,7 +1,10 @@
 package server.service;
 
 import common.dto.AwardStructure;
-import common.messages.*;
+import common.messages.ChangeUserNameResponse;
+import common.messages.FinishGameRequest;
+import common.messages.FinishGameResponse;
+import common.messages.StartGameResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +15,13 @@ import platform.service.UserProfileRegistry;
 import platform.session.Session;
 import platform.session.SessionMap;
 import server.common.GameResult;
+import server.common.ProfileState;
 import server.domain.InventoryItem;
 import server.domain.UserProfile;
 
 import javax.annotation.Resource;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,9 +39,6 @@ public class ProfileService {
 
     @Autowired
     private TopRequestService topRequestService;
-
-//    @Autowired
-//    private EnterAccount enterAccount;
 
     @Autowired
     private SessionMap sessionMap;
@@ -104,7 +103,7 @@ public class ProfileService {
         LocalDate currentTime = LocalDate.now();
         LocalDate localDate = createdTime.toLocalDate();
 
-        if(currentTime.equals(localDate)){
+        if (currentTime.equals(localDate)) {
             changeUserNameResponse.errorCode = STATUS_ERROR;
             changeUserNameResponse.errorMessage = CHANGE_NAME_ERROR_MESSAGE;
         }
@@ -116,12 +115,15 @@ public class ProfileService {
     private FinishGameResponse takeWinningActions(Integer userId) {
         UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
         user.setExperience(user.getExperience() + 10);
+
         UserProfile currentUser = recalculateUserLevel(user);
 
         currentUser.setMoney(currentUser.getMoney() + 10);
         currentUser.setRating(currentUser.getRating() + 3);
+
         userProfileRegistry.updateUserProfile(currentUser);
 
+        currentUser.setState(ProfileState.MAIN_MENU);
         AwardStructure userAward = getUserAward(userId);
         return new FinishGameResponse(userAward);
     }
@@ -131,6 +133,7 @@ public class ProfileService {
         user.setExperience(user.getExperience() + 3);
         UserProfile currentUser = recalculateUserLevel(user);
 
+        currentUser.setState(ProfileState.MAIN_MENU);
         AwardStructure userAward = getUserAward(userId);
 
         if (currentUser.getRating() > 0) {
@@ -149,15 +152,17 @@ public class ProfileService {
     }
 
     private StartGameResponse getStartGameResponse(Integer userId) {
+        var startGameResponse = new StartGameResponse();
         UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
+
         if (user.getEnergy() >= ENERGY_GAME_PRICE) {
             user.setEnergy(user.getEnergy() - ENERGY_GAME_PRICE);
             userProfileRegistry.updateUserProfile(user);
 
-            return new StartGameResponse();
+            user.setState(ProfileState.IN_GAME);
+            return startGameResponse;
         }
 
-        var startGameResponse = new StartGameResponse();
         startGameResponse.errorCode = STATUS_ERROR;
         startGameResponse.errorMessage = ENERGY_ERROR_MESSAGE;
 

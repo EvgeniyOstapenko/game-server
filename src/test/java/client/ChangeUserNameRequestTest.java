@@ -2,15 +2,11 @@ package client;
 
 import common.messages.ChangeUserNameRequest;
 import common.messages.ChangeUserNameResponse;
-import common.messages.FinishGameResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import server.ServerApplication;
-
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
