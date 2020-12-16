@@ -52,9 +52,6 @@ public class ProfileService {
     @Value("#{costOfGame}")
     Integer ENERGY_GAME_PRICE;
 
-    @Value("${ratingErrorMessage}")
-    String RATING_ERROR_MESSAGE;
-
     @Value("${energyErrorMessage}")
     String ENERGY_ERROR_MESSAGE;
 
@@ -63,9 +60,6 @@ public class ProfileService {
 
     @Value("${statusError}")
     Integer STATUS_ERROR;
-
-    @Value("${statusOk}")
-    Integer STATUS_OK;
 
     public UserProfile findUserProfileOrCreateNew(String uid) {
         var profile = userProfileRegistry.findUserProfileByUid(uid);
@@ -138,17 +132,11 @@ public class ProfileService {
 
         if (currentUser.getRating() > 0) {
             currentUser.setRating(currentUser.getRating() - 1);
-            userProfileRegistry.updateUserProfile(currentUser);
 
-            return new FinishGameResponse(userAward);
         }
 
-        var finishGameResponse = new FinishGameResponse(userAward);
-        finishGameResponse.errorCode = STATUS_ERROR;
-        finishGameResponse.errorMessage = RATING_ERROR_MESSAGE;
-
-        userProfileRegistry.updateUserProfile(user);
-        return finishGameResponse;
+        userProfileRegistry.updateUserProfile(currentUser);
+        return new FinishGameResponse(userAward);
     }
 
     private StartGameResponse getStartGameResponse(Integer userId) {

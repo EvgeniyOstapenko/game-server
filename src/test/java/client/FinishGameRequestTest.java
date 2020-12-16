@@ -11,6 +11,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import server.ServerApplication;
 import server.common.GameResult;
+import server.domain.UserProfile;
+import server.service.ProfileService;
+
+import javax.annotation.Resource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -19,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 @SpringBootTest(classes = ServerApplication.class)
 @TestPropertySource(locations = {"/application-test.properties"})
 public class FinishGameRequestTest extends ConnectAndLoginTests {
+
+    @Resource
+    ProfileService profileService;
 
     @Value("${duplicateFinishRequestsErrorMessage}")
     String DUPLICATE_REQUEST_ERROR_MESSAGE;
@@ -29,12 +36,13 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
-    @Value("${ratingErrorMessage}")
-    String RATING_ERROR_MESSAGE;
+    @Value("${testProfileId}")
+    Integer TEST_PROFILE_ID;
+
 
     @Test
-    public void start() throws Exception {
-//        successLoginTest();
+    public void finishGameRequestTest() throws Exception {
+        successLoginTest();
 
         //GIVEN
         FinishGameRequest finishGameRequest = new FinishGameRequest();
@@ -46,24 +54,6 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
 
         //THEN
         assertSame(STATUS_OK, response.errorCode);
-    }
-
-
-    @Test
-    public void onMessageTestWithNotEnoughRatingToProceedShouldReturnErrorResponse() {
-        successLoginTest();
-
-        //GIVEN
-        FinishGameRequest defeatGameFinishRequest = new FinishGameRequest();
-        defeatGameFinishRequest.setResult(GameResult.DEFEAT);
-
-        //WHEN
-        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
-        FinishGameResponse response = clientConnection.request(defeatGameFinishRequest, FinishGameResponse.class);
-
-        //THEN
-        assertSame(STATUS_ERROR, response.errorCode);
-        assertEquals(RATING_ERROR_MESSAGE, response.errorMessage);
     }
 
 
@@ -88,7 +78,7 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
     @Test
     @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void onMessageTestForUserAwardReturnShouldReturnResponseWithUserAward() {
-        successLoginTest();
+//        successLoginTest();
 
         //GIVEN
         FinishGameRequest defeatGameFinishRequest = new FinishGameRequest();
@@ -101,6 +91,28 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
         //THEN
         assertSame(STATUS_OK, response.errorCode);
         assertSame(20, response.award.getEnergy());
+
+        //AFTER
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+    }
+
+    @Test
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void onMessageTestForCheckingRatingAlwaysPositiveReturnShouldReturnResponseWithUserZeroRating() {
+//        successLoginTest();
+
+        //GIVEN
+        FinishGameRequest defeatGameFinishRequest = new FinishGameRequest();
+        defeatGameFinishRequest.setResult(GameResult.DEFEAT);
+
+        //WHEN
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+        FinishGameResponse response = clientConnection.request(defeatGameFinishRequest, FinishGameResponse.class);
+
+        //THEN
+        assertSame(STATUS_OK, response.errorCode);
+        UserProfile profile = profileService.selectUserProfile(TEST_PROFILE_ID);
+        assertSame(0, profile.getRating());
 
         //AFTER
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
