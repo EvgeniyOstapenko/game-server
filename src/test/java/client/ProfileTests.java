@@ -5,7 +5,6 @@ import common.messages.FinishGameResponse;
 import common.messages.StartGameRequest;
 import common.messages.StartGameResponse;
 import common.util.MessageUtil;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.when;
 
- @SpringBootTest(classes = ServerApplication.class)
+@SpringBootTest(classes = ServerApplication.class)
 @TestPropertySource("/application-test.properties")
 public class ProfileTests extends ConnectAndLoginTests {
 
@@ -66,7 +65,7 @@ public class ProfileTests extends ConnectAndLoginTests {
     }
 
     // mock method
-    public StartGameResponse request(StartGameRequest message, Class<StartGameResponse> responseClass) {
+    private StartGameResponse request(StartGameRequest message, Class<StartGameResponse> responseClass) {
         if (profile.getEnergy() >= 5) {
             profile.setEnergy(profile.getEnergy() - 5);
 

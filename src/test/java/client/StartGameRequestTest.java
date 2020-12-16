@@ -19,15 +19,12 @@ public class StartGameRequestTest extends ConnectAndLoginTests {
     @Value("${duplicateStartRequestsErrorMessage}")
     String DUPLICATE_REQUEST_ERROR_MESSAGE;
 
-    @Value("${statusOk}")
-    Integer STATUS_OK;
-
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
     @Test
     @Order(1)
-    public void start() throws Exception {
+    public void startGameRequestTest() throws Exception {
         successLoginTest();
 
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
