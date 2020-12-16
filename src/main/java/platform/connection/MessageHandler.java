@@ -118,6 +118,9 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         } catch (DuplicateMessageStateException error) {
             String errorMessage = error.getReason();
             log.error(errorMessage, message.getClass());
+
+            Channel channel = ctx.channel();
+            channel.close();
         }
     }
 
