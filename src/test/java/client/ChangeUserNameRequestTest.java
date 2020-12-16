@@ -6,9 +6,13 @@ import common.messages.FinishGameResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import server.ServerApplication;
 
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 @SpringBootTest(classes = ServerApplication.class)
@@ -21,8 +25,11 @@ public class ChangeUserNameRequestTest extends ConnectAndLoginTests {
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
+    @Value("${changeNameErrorMassage}")
+    String CHANGE_NAME_ERROR_MESSAGE;
+
     @Test
-    public void start() throws Exception {
+    public void changeUserNameRequestTestSentRequestInTheSameDayShouldReturnErrorMessage() throws Exception {
         successLoginTest();
 
         //WHEN
@@ -30,5 +37,6 @@ public class ChangeUserNameRequestTest extends ConnectAndLoginTests {
 
         //THEN
         assertSame(STATUS_ERROR, response.errorCode);
+        assertEquals(CHANGE_NAME_ERROR_MESSAGE, response.errorMessage);
     }
 }

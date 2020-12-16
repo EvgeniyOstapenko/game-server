@@ -59,6 +59,9 @@ public class ProfileService {
     @Value("${energyErrorMessage}")
     String ENERGY_ERROR_MESSAGE;
 
+    @Value("${changeNameErrorMassage}")
+    String CHANGE_NAME_ERROR_MESSAGE;
+
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
@@ -101,12 +104,10 @@ public class ProfileService {
         LocalDate currentTime = LocalDate.now();
         LocalDate localDate = createdTime.toLocalDate();
 
-
         if(currentTime.equals(localDate)){
             changeUserNameResponse.errorCode = STATUS_ERROR;
-            changeUserNameResponse.errorMessage = "User can change name only once for a day";
+            changeUserNameResponse.errorMessage = CHANGE_NAME_ERROR_MESSAGE;
         }
-
 
         return changeUserNameResponse;
     }
