@@ -4,10 +4,7 @@ import common.exception.DuplicateMessageStateException;
 import common.messages.AbstractResponse;
 import common.util.KeyValue;
 import common.util.MessageUtil;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +64,30 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         openConnections.put(ctx.channel(), Session.EMPTY_SESSION);
     }
 
+    private PendingWriteQueue queue;
+    private int freeSlots = 100;
+
+    private synchronized void trySendMessages(ChannelHandlerContext ctx) {
+        if(this.freeSlots > 0) {
+            while(this.freeSlots > 0) {
+                if(this.queue.removeAndWrite() == null) {
+                    ctx.flush();
+                    return;
+                }
+                this.freeSlots--;
+            }
+            ctx.flush();
+        }
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, final Object message) throws Exception {
+
+        queue = new PendingWriteQueue(ctx);
+
+        this.queue.add(message, new DefaultChannelPromise(ctx.channel()));
+        trySendMessages(ctx);
+
         var channel = ctx.channel();
         if (message instanceof ILogin) {
             var error = new KeyValue<Integer, String>();
