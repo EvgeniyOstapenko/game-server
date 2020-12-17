@@ -21,14 +21,8 @@ public class TopRequestService {
     @Value("${numberOfTopPlayers}")
     Integer NUMBER_OF_TOP_PLAYERS;
 
-
-    public void onRatingChange() {
-        topList = getTopUserListFromDB();
-    }
-
     public List<TopItem> getTopList() {
-        onRatingChange();
-        return topList;
+        return getTopUserListFromDB();
     }
 
     private List<TopItem> getTopUserListFromDB() {
