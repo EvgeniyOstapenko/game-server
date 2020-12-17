@@ -20,10 +20,7 @@ import server.domain.UserProfile;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -63,6 +60,7 @@ public class ProfileService {
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
+    private Map<Integer, LocalDate> nameChangeDateMap = new HashMap<>();
 
     public UserProfile findUserProfileOrCreateNew(String uid) {
         var profile = userProfileRegistry.findUserProfileByUid(uid);
@@ -93,7 +91,7 @@ public class ProfileService {
 
     private ChangeUserNameResponse changeUserName(Integer userId, String newUserName) {
         UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
-        boolean allowedNameToBeChanged = isAllowedNameToBeChanged(user);
+        boolean allowedNameToBeChanged = isAllowedNameToBeChanged(user.id());
 
         ChangeUserNameResponse changeUserNameResponse = new ChangeUserNameResponse();
 
@@ -106,21 +104,20 @@ public class ProfileService {
         return changeUserNameResponse;
     }
 
-    private boolean isAllowedNameToBeChanged(UserProfile user){
-        List<LocalDate> nameChangeDateList = user.getNameChangeDate();
-
+    private boolean isAllowedNameToBeChanged(int userId) {
         LocalDate currentTime = LocalDate.now();
-        if(nameChangeDateList.isEmpty()){
-            nameChangeDateList.add(currentTime);
+
+        if (nameChangeDateMap.isEmpty()) {
+            nameChangeDateMap.put(userId, currentTime);
             return true;
         }
 
-        LocalDate previousNameChangeTime = nameChangeDateList.get(0);
+        LocalDate previousNameChangeTime = nameChangeDateMap.get(userId);
         if (currentTime.equals(previousNameChangeTime)) {
             return false;
         }
 
-        nameChangeDateList.add(0, currentTime);
+        nameChangeDateMap.put(userId, currentTime);
         return true;
     }
 

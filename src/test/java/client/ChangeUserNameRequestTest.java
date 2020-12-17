@@ -25,11 +25,31 @@ public class ChangeUserNameRequestTest extends ConnectAndLoginTests {
     String CHANGE_NAME_ERROR_MESSAGE;
 
     @Test
-    public void changeUserNameRequestTestSentRequestInTheSameDayShouldReturnErrorMessage() throws Exception {
+    public void changeUserNameRequestTestSentRequestInTheSameDayShouldPassWithoutError() throws Exception {
         successLoginTest();
 
+        //GIVEN
+        ChangeUserNameRequest changeUserNameRequest = new ChangeUserNameRequest();
+        changeUserNameRequest.setNewUserName("newName");
+
         //WHEN
-        ChangeUserNameResponse response = clientConnection.request(new ChangeUserNameRequest(), ChangeUserNameResponse.class);
+        ChangeUserNameResponse response = clientConnection.request(changeUserNameRequest, ChangeUserNameResponse.class);
+
+        //THEN
+        assertSame(STATUS_OK, response.errorCode);
+    }
+
+    @Test
+    public void changeUserNameRequestTestSentRequestInTheSameDayShouldNotPassAndReturnError() throws Exception {
+//        successLoginTest();
+
+        //GIVEN
+        ChangeUserNameRequest changeUserNameRequest = new ChangeUserNameRequest();
+        changeUserNameRequest.setNewUserName("newName");
+
+        //WHEN
+        clientConnection.request(changeUserNameRequest, ChangeUserNameResponse.class);
+        ChangeUserNameResponse response = clientConnection.request(changeUserNameRequest, ChangeUserNameResponse.class);
 
         //THEN
         assertSame(STATUS_ERROR, response.errorCode);
