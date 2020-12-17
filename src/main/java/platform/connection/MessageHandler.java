@@ -47,15 +47,24 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
+    @Value("${freeQueueSlots}")
+    private int FREE_QUEUE_SLOTS = 100;
+
     private Map<Channel, Session> openConnections = new ConcurrentHashMap<>();
 
     private Map<Class, MessageController> controllers = Collections.emptyMap();
 
-    private Object message;
+    private PendingWriteQueue pendingQueue;
+
 
     @Autowired(required = false)
     private void setControllers(List<MessageController> controllers) {
         this.controllers = controllers.stream().collect(Collectors.toMap(MessageController::messageClass, c -> c));
+    }
+
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        this.pendingQueue = new PendingWriteQueue(ctx);
     }
 
     @Override
@@ -66,31 +75,9 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         openConnections.put(ctx.channel(), Session.EMPTY_SESSION);
     }
 
-    private PendingWriteQueue queue;
-    private int freeSlots = 10;
-
-    private synchronized void trySendMessages(ChannelHandlerContext ctx) {
-        if(this.freeSlots > 0) {
-            while(this.freeSlots > 0) {
-                if(this.queue.removeAndWrite() == null) {
-                    ctx.flush();
-                    return;
-                }
-                this.freeSlots--;
-            }
-
-        }
-    }
-
     @Override
     public void channelRead(ChannelHandlerContext ctx, final Object message) throws Exception {
 
-        queue = new PendingWriteQueue(ctx);
-        this.message = message;
-
-//        this.queue.add(message, new DefaultChannelPromise(ctx.channel()));
-//        trySendMessages(ctx);
-
         var channel = ctx.channel();
         if (message instanceof ILogin) {
             var error = new KeyValue<Integer, String>();
@@ -98,62 +85,26 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
             if (session != null) {
                 openConnections.put(channel, session);
                 var outMessages = loginController.onSuccessLogin(session.profile);
-                outMessages.forEach(channel::write);
-                channel.flush();
 
-//                for (Object m : outMessages) {
-//                    this.queue.add(message, new DefaultChannelPromise(ctx.channel()));
-//                }
-//                trySendMessages(ctx);
-
+                for (Object m : outMessages) {
+                    pendingQueue.add(m, new DefaultChannelPromise(ctx.channel()));
+                }
 
             } else {
-//                channel.writeAndFlush(loginController.onLoginError((ILogin) message, error));
+                this.pendingQueue.add(loginController.onLoginError((ILogin) message, error), new DefaultChannelPromise(ctx.channel()));
             }
         } else {
             var messageController = controllers.get(message.getClass());
             if (messageController != null) {
                 var outMessage = getResponseMessage(message, messageController, channel);
                 if (outMessage != null) {
-//                    channel.writeAndFlush(outMessage);
+                    this.pendingQueue.add(outMessage, new DefaultChannelPromise(ctx.channel()));
                 }
             } else {
                 log.error("Controller for message of class [{}] not found!", message.getClass());
             }
         }
-    }
-
-    public void channelRead1(ChannelHandlerContext ctx, final Object message){
-
-        queue = new PendingWriteQueue(ctx);
-        this.message = message;
-
-        this.queue.add(message, new DefaultChannelPromise(ctx.channel()));
-        trySendMessages(ctx);
-
-        var channel = ctx.channel();
-        if (message instanceof ILogin) {
-            var error = new KeyValue<Integer, String>();
-            var session = authService.authorize((ILogin) message, channel, error);
-            if (session != null) {
-                openConnections.put(channel, session);
-                var outMessages = loginController.onSuccessLogin(session.profile);
-                outMessages.forEach(channel::write);
-                channel.flush();
-            } else {
-                channel.writeAndFlush(loginController.onLoginError((ILogin) message, error));
-            }
-        } else {
-            var messageController = controllers.get(message.getClass());
-            if (messageController != null) {
-                var outMessage = getResponseMessage(message, messageController, channel);
-                if (outMessage != null) {
-                    channel.writeAndFlush(outMessage);
-                }
-            } else {
-                log.error("Controller for message of class [{}] not found!", message.getClass());
-            }
-        }
+        sendMessagesThroughQueue(ctx);
     }
 
     @Override
@@ -171,6 +122,18 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         var session = openConnections.remove(ctx.channel());
         if (session != null && session.profile != null) {
             sessionMap.closeSession(session.profile.id());
+        }
+    }
+
+    private synchronized void sendMessagesThroughQueue(ChannelHandlerContext ctx) {
+        if (this.FREE_QUEUE_SLOTS > 0) {
+            while (this.FREE_QUEUE_SLOTS > 0) {
+                if (this.pendingQueue.removeAndWrite() == null) {
+                    ctx.flush();
+                    return;
+                }
+                this.FREE_QUEUE_SLOTS--;
+            }
         }
     }
 
