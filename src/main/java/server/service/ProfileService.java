@@ -20,7 +20,10 @@ import server.domain.UserProfile;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -47,9 +50,6 @@ public class ProfileService {
 
     @Value("#{costOfGame}")
     Integer ENERGY_GAME_PRICE;
-
-    @Value("${ratingErrorMessage}")
-    String RATING_ERROR_MESSAGE;
 
     @Value("${energyErrorMessage}")
     String ENERGY_ERROR_MESSAGE;
@@ -148,17 +148,11 @@ public class ProfileService {
 
         if (currentUser.getRating() > 0) {
             currentUser.setRating(currentUser.getRating() - 1);
-            userProfileRegistry.updateUserProfile(currentUser);
 
-            return new FinishGameResponse(userAward);
         }
 
-        var finishGameResponse = new FinishGameResponse(userAward);
-        finishGameResponse.errorCode = STATUS_ERROR;
-        finishGameResponse.errorMessage = RATING_ERROR_MESSAGE;
-
-        userProfileRegistry.updateUserProfile(user);
-        return finishGameResponse;
+        userProfileRegistry.updateUserProfile(currentUser);
+        return new FinishGameResponse(userAward);
     }
 
     private StartGameResponse getStartGameResponse(Integer userId) {

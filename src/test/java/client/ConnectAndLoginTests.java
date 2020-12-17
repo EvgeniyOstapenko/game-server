@@ -53,7 +53,7 @@ public class ConnectAndLoginTests {
         return clientConnection.request(message, responseClass);
     }
 
-        @AfterAll
+    @AfterAll
     public static void destroy() {
         clientConnection.disconnect();
     }

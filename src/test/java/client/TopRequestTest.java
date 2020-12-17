@@ -26,7 +26,7 @@ public class TopRequestTest extends ConnectAndLoginTests {
     Integer NUMBER_OF_PLAYERS;
 
     @Test
-    public void start() throws Exception {
+    public void topRequestTest() throws Exception {
         successLoginTest();
 
         //WHEN
@@ -41,7 +41,7 @@ public class TopRequestTest extends ConnectAndLoginTests {
     @Sql(value = {"/toFill-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = {"/toClean-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void onMessageTestRequestToGetTopUserListShouldReturnTopUsersList() {
-        successLoginTest();
+//        successLoginTest();
 
         //WHEN
         TopResponse response = clientConnection.request(new TopRequest(), TopResponse.class);

@@ -4,10 +4,7 @@ import common.exception.DuplicateMessageStateException;
 import common.messages.AbstractResponse;
 import common.util.KeyValue;
 import common.util.MessageUtil;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +47,24 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
+    @Value("${freeQueueSlots}")
+    private int FREE_QUEUE_SLOTS = 100;
+
     private Map<Channel, Session> openConnections = new ConcurrentHashMap<>();
 
     private Map<Class, MessageController> controllers = Collections.emptyMap();
 
+    private PendingWriteQueue pendingQueue;
+
+
     @Autowired(required = false)
     private void setControllers(List<MessageController> controllers) {
         this.controllers = controllers.stream().collect(Collectors.toMap(MessageController::messageClass, c -> c));
+    }
+
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        this.pendingQueue = new PendingWriteQueue(ctx);
     }
 
     @Override
@@ -69,6 +77,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, final Object message) throws Exception {
+
         var channel = ctx.channel();
         if (message instanceof ILogin) {
             var error = new KeyValue<Integer, String>();
@@ -76,22 +85,25 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
             if (session != null) {
                 openConnections.put(channel, session);
                 var outMessages = loginController.onSuccessLogin(session.profile);
-                outMessages.forEach(channel::write);
-                channel.flush();
+                for (Object m : outMessages) {
+                    this.pendingQueue.add(m, new DefaultChannelPromise(ctx.channel()));
+                }
+
             } else {
-                channel.writeAndFlush(loginController.onLoginError((ILogin) message, error));
+                this.pendingQueue.add(loginController.onLoginError((ILogin) message, error), new DefaultChannelPromise(ctx.channel()));
             }
         } else {
             var messageController = controllers.get(message.getClass());
             if (messageController != null) {
                 var outMessage = getResponseMessage(message, messageController, channel);
                 if (outMessage != null) {
-                    channel.writeAndFlush(outMessage);
+                    this.pendingQueue.add(outMessage, new DefaultChannelPromise(ctx.channel()));
                 }
             } else {
                 log.error("Controller for message of class [{}] not found!", message.getClass());
             }
         }
+        sendMessagesThroughQueue(ctx);
     }
 
     @Override
@@ -112,12 +124,27 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    private synchronized void sendMessagesThroughQueue(ChannelHandlerContext ctx) {
+        if (this.FREE_QUEUE_SLOTS > 0) {
+            while (this.FREE_QUEUE_SLOTS > 0) {
+                if (this.pendingQueue.removeAndWrite() == null) {
+                    ctx.flush();
+                    return;
+                }
+                this.FREE_QUEUE_SLOTS--;
+            }
+        }
+    }
+
     private void validateStartGameAndFinishGAmeRequests(Object message, ChannelHandlerContext ctx) {
         try {
             messageUtil.checkStartOrFinishDuplicateState(message);
         } catch (DuplicateMessageStateException error) {
             String errorMessage = error.getReason();
             log.error(errorMessage, message.getClass());
+
+            Channel channel = ctx.channel();
+            channel.close();
         }
     }
 

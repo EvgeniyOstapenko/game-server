@@ -27,7 +27,7 @@ public class Connection {
     protected NioEventLoopGroup bossGroup;
     protected NioEventLoopGroup workerGroup;
 
-    @Value("${Connection.acceptorsCount:2}")
+    @Value("${Connection.acceptorsCount:4}")
     private int acceptorsCount;
 
     @Value("${Connection.port:5000}")
