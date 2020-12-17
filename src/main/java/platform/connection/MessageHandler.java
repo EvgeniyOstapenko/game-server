@@ -87,7 +87,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
                 var outMessages = loginController.onSuccessLogin(session.profile);
 
                 for (Object m : outMessages) {
-                    pendingQueue.add(m, new DefaultChannelPromise(ctx.channel()));
+                    this.pendingQueue.add(m, new DefaultChannelPromise(ctx.channel()));
                 }
 
             } else {
