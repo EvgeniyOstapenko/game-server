@@ -132,6 +132,7 @@ public class ProfileService {
         currentUser.setMoney(currentUser.getMoney() + 10);
         currentUser.setRating(currentUser.getRating() + 3);
 
+        topRequestService.onRatingChange(currentUser);
         userProfileRegistry.updateUserProfile(currentUser);
 
         currentUser.setState(ProfileState.MAIN_MENU);
@@ -149,7 +150,7 @@ public class ProfileService {
 
         if (currentUser.getRating() > 0) {
             currentUser.setRating(currentUser.getRating() - 1);
-
+            topRequestService.onRatingChange(currentUser);
         }
 
         userProfileRegistry.updateUserProfile(currentUser);

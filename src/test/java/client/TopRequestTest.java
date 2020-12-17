@@ -37,10 +37,22 @@ public class TopRequestTest extends ConnectAndLoginTests {
 
     }
 
-    @Test
+//    @Test
     @Sql(value = {"/toFill-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(value = {"/toClean-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    public void onMessageTestRequestToGetTopUserListShouldReturnTopUsersList() {
+    public void onMessageTestRequestToGetTopUserListShouldReturnTopUsersList1() {
+//        successLoginTest();
+
+        //WHEN
+        TopResponse response = clientConnection.request(new TopRequest(), TopResponse.class);
+
+        //THEN
+        assertSame(STATUS_OK, response.errorCode);
+        assertEquals(NUMBER_OF_PLAYERS, response.topList.size());
+    }
+
+    @Test
+    public void onMessageTestRequestToGetTopUserListShouldReturnTopUsersList2() {
 //        successLoginTest();
 
         //WHEN
