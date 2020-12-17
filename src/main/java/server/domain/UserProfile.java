@@ -4,6 +4,8 @@ import common.dto.UserProfileStructure;
 import platform.domain.IUser;
 import server.common.ProfileState;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +32,8 @@ public class UserProfile implements IUser {
     private Set<Integer> friends;
 
     private ProfileState state = ProfileState.MAIN_MENU;
+
+    private List<LocalDate> nameChangeDate = new ArrayList<>(1);
 
     public UserProfile(int id) {
         this.id = id;
@@ -146,5 +150,13 @@ public class UserProfile implements IUser {
     @Override
     public int id() {
         return id;
+    }
+
+    public List<LocalDate> getNameChangeDate() {
+        return nameChangeDate;
+    }
+
+    public void setNameChangeDate(List<LocalDate> nameChangeDate) {
+        this.nameChangeDate = this.nameChangeDate;
     }
 }

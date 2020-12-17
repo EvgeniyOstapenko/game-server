@@ -19,7 +19,7 @@ public class ChangeUserNameController implements MessageController<ChangeUserNam
 
     @Override
     public Object onMessage(ChangeUserNameRequest changeUserNameRequest, UserProfile userProfile) {
-        return profileService.getChangeUserNameResponse(userProfile.id());
+        return profileService.getChangeUserNameResponse(userProfile.id(), changeUserNameRequest.getNewUserName());
     }
 
     @Override

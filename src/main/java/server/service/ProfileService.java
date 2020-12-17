@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.TestPropertySource;
 import platform.service.UserProfileRegistry;
-import platform.session.Session;
 import platform.session.SessionMap;
 import server.common.GameResult;
 import server.common.ProfileState;
@@ -64,8 +63,6 @@ public class ProfileService {
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
-    @Value("${statusOk}")
-    Integer STATUS_OK;
 
     public UserProfile findUserProfileOrCreateNew(String uid) {
         var profile = userProfileRegistry.findUserProfileByUid(uid);
@@ -90,25 +87,41 @@ public class ProfileService {
         return takeLosingActions(userId);
     }
 
-    public ChangeUserNameResponse getChangeUserNameResponse(Integer userId) {
-        return changeUserName(userId);
+    public ChangeUserNameResponse getChangeUserNameResponse(Integer userId, String newUserName) {
+        return changeUserName(userId, newUserName);
     }
 
-    private ChangeUserNameResponse changeUserName(Integer userId) {
+    private ChangeUserNameResponse changeUserName(Integer userId, String newUserName) {
+        UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
+        boolean allowedNameToBeChanged = isAllowedNameToBeChanged(user);
+
         ChangeUserNameResponse changeUserNameResponse = new ChangeUserNameResponse();
 
-        Session sessionByProfileId = sessionMap.getSessionByProfileId(userId);
-        LocalDateTime createdTime = sessionByProfileId.createdAt;
-
-        LocalDate currentTime = LocalDate.now();
-        LocalDate localDate = createdTime.toLocalDate();
-
-        if (currentTime.equals(localDate)) {
+        if (!allowedNameToBeChanged) {
             changeUserNameResponse.errorCode = STATUS_ERROR;
             changeUserNameResponse.errorMessage = CHANGE_NAME_ERROR_MESSAGE;
         }
 
+        user.setName(newUserName);
         return changeUserNameResponse;
+    }
+
+    private boolean isAllowedNameToBeChanged(UserProfile user){
+        List<LocalDate> nameChangeDateList = user.getNameChangeDate();
+
+        LocalDate currentTime = LocalDate.now();
+        if(nameChangeDateList.isEmpty()){
+            nameChangeDateList.add(currentTime);
+            return true;
+        }
+
+        LocalDate previousNameChangeTime = nameChangeDateList.get(0);
+        if (currentTime.equals(previousNameChangeTime)) {
+            return false;
+        }
+
+        nameChangeDateList.add(0, currentTime);
+        return true;
     }
 
 
