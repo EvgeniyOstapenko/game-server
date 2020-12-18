@@ -26,7 +26,12 @@ public class TopRequestService {
 
     public void onRatingChange(UserProfile user) {
         TopItem topItem = new TopItem(user.id(), user.getName(), user.getRating());
-        topList.add(topItem);
+
+        if(topList.stream().anyMatch(item -> item.profileId == user.id())) {
+            topList.add();
+            topList.add(topItem);
+        }
+
     }
 
     public List<TopItem> getTopList() {
