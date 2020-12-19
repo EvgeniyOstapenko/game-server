@@ -11,6 +11,8 @@ import org.springframework.test.context.jdbc.Sql;
 import server.ServerApplication;
 import server.common.GameResult;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.when;
@@ -70,6 +72,11 @@ public class TopRequestTest extends ConnectAndLoginTests {
         when((messageUtil).isRequestDuplicate(startGameRequest)).thenReturn(false);
         clientConnection.request(startGameRequest, StartGameResponse.class);
         clientConnection.request(startGameRequest, StartGameResponse.class);
+
+        enterAccount = clientConnection.request(new common.messages.Login(UUID.randomUUID().toString(), VALID_TOKEN), EnterAccount.class);
+        clientConnection.request(startGameRequest, StartGameResponse.class);
+        clientConnection.request(startGameRequest, StartGameResponse.class);
+
         clientConnection.request(finishGameRequest, FinishGameResponse.class);
         TopResponse response = clientConnection.request(new TopRequest(), TopResponse.class);
 
