@@ -25,6 +25,14 @@ public class TopRequestService {
     Integer NUMBER_OF_TOP_PLAYERS;
 
     public void onRatingChange(UserProfile user) {
+        addToTopList(user);
+    }
+
+    public List<TopItem> getTopList() {
+        return topList.stream().sorted(Comparator.comparingInt(item -> item.rating)).limit(NUMBER_OF_TOP_PLAYERS).collect(Collectors.toList());
+    }
+
+    private void addToTopList(UserProfile user) {
         TopItem newItem = new TopItem(user.id(), user.getName(), user.getRating());
 
         if(topList.isEmpty()){
@@ -41,10 +49,6 @@ public class TopRequestService {
             }
         }
         topList.add(newItem);
-    }
-
-    public List<TopItem> getTopList() {
-        return topList.stream().sorted(Comparator.comparingInt(item -> item.rating)).limit(NUMBER_OF_TOP_PLAYERS).collect(Collectors.toList());
     }
 
     private List<TopItem> getTopUserListFromDB() {
