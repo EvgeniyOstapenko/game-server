@@ -12,6 +12,7 @@ import server.ServerApplication;
 import server.common.GameResult;
 
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -70,19 +71,15 @@ public class TopRequestTest extends ConnectAndLoginTests {
 
         //WHEN
         when((messageUtil).isRequestDuplicate(startGameRequest)).thenReturn(false);
-        clientConnection.request(startGameRequest, StartGameResponse.class);
-        clientConnection.request(startGameRequest, StartGameResponse.class);
 
-        enterAccount = clientConnection.request(new common.messages.Login(UUID.randomUUID().toString(), VALID_TOKEN), EnterAccount.class);
-        clientConnection.request(startGameRequest, StartGameResponse.class);
-        clientConnection.request(startGameRequest, StartGameResponse.class);
-
-        clientConnection.request(finishGameRequest, FinishGameResponse.class);
+        IntStream.rangeClosed(1, 10).forEach(i -> {
+            enterAccount = clientConnection.request(new common.messages.Login(UUID.randomUUID().toString(), VALID_TOKEN), EnterAccount.class);
+            clientConnection.request(new TopRequest(), TopResponse.class);
+        });
         TopResponse response = clientConnection.request(new TopRequest(), TopResponse.class);
 
         //THEN
-        assertSame(STATUS_OK, response.errorCode);
-//        assertEquals(NUMBER_OF_PLAYERS, response.topList.size());
+        assertSame(NUMBER_OF_PLAYERS, response.topList.size());
     }
 
 

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class TopRequestService {
 
-    private static List<TopItem> topList = new ArrayList<>();
+    private volatile List<TopItem> topList = new ArrayList<>();
 
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -37,15 +37,14 @@ public class TopRequestService {
 
                 item.profileName = newItem.profileName;
                 item.rating = newItem.rating;
-                break;
+                return;
             }
-
         }
+        topList.add(newItem);
     }
 
     public List<TopItem> getTopList() {
-//        return topList.stream().sorted(Comparator.comparingInt(item -> item.rating)).limit(NUMBER_OF_TOP_PLAYERS).collect(Collectors.toList());
-        return topList;
+        return topList.stream().sorted(Comparator.comparingInt(item -> item.rating)).limit(NUMBER_OF_TOP_PLAYERS).collect(Collectors.toList());
     }
 
     private List<TopItem> getTopUserListFromDB() {
