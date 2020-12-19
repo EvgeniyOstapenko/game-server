@@ -15,6 +15,7 @@ import platform.messages.ILogin;
 import platform.service.AuthService;
 import platform.service.LoginController;
 import platform.service.MessageController;
+import platform.service.UserProfileRegistry;
 import platform.session.Session;
 import platform.session.SessionMap;
 
@@ -34,6 +35,9 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     @Autowired
     MessageUtil messageUtil;
+
+    @Autowired
+    UserProfileRegistry userProfileRegistry;
 
     @Resource
     private AuthService authService;
@@ -150,14 +154,15 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     private Object getResponseMessage(Object message, MessageController messageController, Channel channel) {
         IUser profile = openConnections.get(channel).profile;
+        IUser userProfile = userProfileRegistry.selectUserProfile(profile.id());
 
         if (!messageUtil.isRequestDuplicate(message)) {
-            return messageController.onMessage(message, profile);
+            return messageController.onMessage(message, userProfile);
         }
 
         String errorMessage = toLogException(message);
 
-        var response = messageController.onMessage(message, profile);
+        var response = messageController.onMessage(message, userProfile);
         AbstractResponse errorResponse = (AbstractResponse) response;
         errorResponse.errorCode = STATUS_ERROR;
         errorResponse.errorMessage = errorMessage;
