@@ -25,7 +25,7 @@ public class ChangeUserNameRequestTest extends ConnectAndLoginTests {
     String CHANGE_NAME_ERROR_MESSAGE;
 
     @Test
-    public void changeUserNameRequestTestSentRequestInTheSameDayShouldPassWithoutError() throws Exception {
+    public void changeUserNameRequestTestSentSingleRequestShouldPassWithoutError() throws Exception {
         successLoginTest();
 
         //GIVEN
@@ -40,7 +40,7 @@ public class ChangeUserNameRequestTest extends ConnectAndLoginTests {
     }
 
     @Test
-    public void changeUserNameRequestTestSentRequestInTheSameDayShouldNotPassAndReturnError() throws Exception {
+    public void changeUserNameRequestTestSentDuplicateRequestInTheSameDayShouldNotPassAndReturnError() throws Exception {
 //        successLoginTest();
 
         //GIVEN
