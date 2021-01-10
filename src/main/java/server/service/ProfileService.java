@@ -78,11 +78,11 @@ public class ProfileService {
         return getStartGameResponse(userId);
     }
 
-    public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, Integer userId) {
+    public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, UserProfile userProfile) {
         if (request.getResult().equals(GameResult.WIN)) {
-            return takeWinningActions(userId);
+            return takeWinningActions(userProfile);
         }
-        return takeLosingActions(userId);
+        return takeLosingActions(userProfile);
     }
 
     public ChangeUserNameResponse getChangeUserNameResponse(UserProfile userProfile, String newUserName) {
@@ -121,8 +121,7 @@ public class ProfileService {
     }
 
 
-    private FinishGameResponse takeWinningActions(Integer userId) {
-        UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
+    private FinishGameResponse takeWinningActions(UserProfile user) {
         user.setExperience(user.getExperience() + 10);
 
         UserProfile currentUser = recalculateUserLevel(user);
@@ -134,17 +133,16 @@ public class ProfileService {
         userProfileRegistry.updateUserProfile(currentUser);
 
         currentUser.setState(ProfileState.MAIN_MENU);
-        AwardStructure userAward = getUserAward(userId);
+        AwardStructure userAward = getUserAward(user);
         return new FinishGameResponse(userAward);
     }
 
-    private FinishGameResponse takeLosingActions(Integer userId) {
-        UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
+    private FinishGameResponse takeLosingActions(UserProfile user) {
         user.setExperience(user.getExperience() + 3);
         UserProfile currentUser = recalculateUserLevel(user);
 
         currentUser.setState(ProfileState.MAIN_MENU);
-        AwardStructure userAward = getUserAward(userId);
+        AwardStructure userAward = getUserAward(user);
 
         if (currentUser.getRating() > 0) {
             currentUser.setRating(currentUser.getRating() - 1);
@@ -207,8 +205,7 @@ public class ProfileService {
         });
     }
 
-    private AwardStructure getUserAward(Integer userId) {
-        UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
+    private AwardStructure getUserAward(UserProfile user) {
         AwardStructure userAward = new AwardStructure();
         userAward.setEnergy(user.getEnergy());
         userAward.setEnergy(user.getEnergy());

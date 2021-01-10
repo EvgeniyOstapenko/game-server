@@ -23,7 +23,7 @@ public class FinishGameController implements MessageController<FinishGameRequest
 
     @Override
     public Object onMessage(FinishGameRequest finishGameRequest, UserProfile userProfile) {
-        return profileService.takeActionsOnFinishGame(finishGameRequest, userProfile.id());
+        return profileService.takeActionsOnFinishGame(finishGameRequest, userProfile);
     }
 
     @Override
