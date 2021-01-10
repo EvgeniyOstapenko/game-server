@@ -85,12 +85,8 @@ public class ProfileService {
         return takeLosingActions(user);
     }
 
-    public ChangeUserNameResponse getChangeUserNameResponse(UserProfile userProfile, String newUserName) {
-        return changeUserName(userProfile, newUserName);
-    }
-
-    private ChangeUserNameResponse changeUserName(UserProfile userProfile, String newUserName) {
-        boolean allowedNameToBeChanged = isAllowedNameToBeChanged(userProfile);
+    public ChangeUserNameResponse changeUserName(UserProfile user, String newUserName) {
+        boolean allowedNameToBeChanged = isAllowedNameToBeChanged(user);
 
         ChangeUserNameResponse changeUserNameResponse = new ChangeUserNameResponse();
 
@@ -99,7 +95,7 @@ public class ProfileService {
             changeUserNameResponse.errorMessage = CHANGE_NAME_ERROR_MESSAGE;
         }
 
-        userProfile.setName(newUserName);
+        user.setName(newUserName);
         return changeUserNameResponse;
     }
 
