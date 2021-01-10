@@ -24,7 +24,7 @@ public class StartGameController implements MessageController<StartGameRequest, 
 
     @Override
     public Object onMessage(StartGameRequest startGameRequest, UserProfile userProfile) {
-        return profileService.takeActionsOnStartGame(userProfile.id());
+        return profileService.takeActionsOnStartGame(userProfile);
     }
 
     @Override

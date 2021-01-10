@@ -74,8 +74,8 @@ public class ProfileService {
         return (UserProfile) userProfileRegistry.selectUserProfile(profileId);
     }
 
-    public StartGameResponse takeActionsOnStartGame(Integer userId) {
-        return getStartGameResponse(userId);
+    public StartGameResponse takeActionsOnStartGame(UserProfile user) {
+        return getStartGameResponse(user);
     }
 
     public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, UserProfile user) {
@@ -154,9 +154,8 @@ public class ProfileService {
         return new FinishGameResponse(userAward);
     }
 
-    private StartGameResponse getStartGameResponse(Integer userId) {
+    private StartGameResponse getStartGameResponse(UserProfile user) {
         var startGameResponse = new StartGameResponse();
-        UserProfile user = (UserProfile) userProfileRegistry.selectUserProfile(userId);
 
         if (user.getEnergy() >= ENERGY_GAME_PRICE) {
             user.setEnergy(user.getEnergy() - ENERGY_GAME_PRICE);
