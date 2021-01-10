@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import server.domain.TopItem;
+import server.domain.UserProfile;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,7 +16,7 @@ import java.util.stream.Collectors;
 @Service
 public class TopRequestService {
 
-    private List<TopItem> topList;
+    private volatile List<TopItem> topList = new ArrayList<>();
 
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -21,8 +24,31 @@ public class TopRequestService {
     @Value("${numberOfTopPlayers}")
     Integer NUMBER_OF_TOP_PLAYERS;
 
+    public void onRatingChange(UserProfile user) {
+        addToTopList(user);
+    }
+
     public List<TopItem> getTopList() {
-        return getTopUserListFromDB();
+        return topList.stream().sorted(Comparator.comparingInt(item -> item.rating)).limit(NUMBER_OF_TOP_PLAYERS).collect(Collectors.toList());
+    }
+
+    private void addToTopList(UserProfile user) {
+        TopItem newItem = new TopItem(user.id(), user.getName(), user.getRating());
+
+        if(topList.isEmpty()){
+            topList.add(newItem);
+            return;
+        }
+
+        for (TopItem item : topList) {
+            if (item.profileId == newItem.profileId) {
+
+                item.profileName = newItem.profileName;
+                item.rating = newItem.rating;
+                return;
+            }
+        }
+        topList.add(newItem);
     }
 
     private List<TopItem> getTopUserListFromDB() {
