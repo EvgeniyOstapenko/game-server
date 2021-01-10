@@ -78,11 +78,11 @@ public class ProfileService {
         return getStartGameResponse(userId);
     }
 
-    public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, UserProfile userProfile) {
+    public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, UserProfile user) {
         if (request.getResult().equals(GameResult.WIN)) {
-            return takeWinningActions(userProfile);
+            return takeWinningActions(user);
         }
-        return takeLosingActions(userProfile);
+        return takeLosingActions(user);
     }
 
     public ChangeUserNameResponse getChangeUserNameResponse(UserProfile userProfile, String newUserName) {
@@ -90,7 +90,7 @@ public class ProfileService {
     }
 
     private ChangeUserNameResponse changeUserName(UserProfile userProfile, String newUserName) {
-        boolean allowedNameToBeChanged = isAllowedNameToBeChanged(userProfile.id());
+        boolean allowedNameToBeChanged = isAllowedNameToBeChanged(userProfile);
 
         ChangeUserNameResponse changeUserNameResponse = new ChangeUserNameResponse();
 
@@ -103,7 +103,8 @@ public class ProfileService {
         return changeUserNameResponse;
     }
 
-    private boolean isAllowedNameToBeChanged(int userId) {
+    private boolean isAllowedNameToBeChanged(UserProfile user) {
+        int userId = user.id();
         LocalDate currentTime = LocalDate.now();
 
         if (nameChangeDateMap.isEmpty()) {
