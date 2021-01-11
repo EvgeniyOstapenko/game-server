@@ -1,11 +1,14 @@
 package server.controller;
 
 import common.messages.FinishGameRequest;
+import common.messages.FinishGameResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import platform.service.MessageController;
+import server.common.ProfileState;
 import server.domain.UserProfile;
 import server.service.ProfileService;
 
@@ -16,6 +19,12 @@ public class FinishGameController implements MessageController<FinishGameRequest
 
     ProfileService profileService;
 
+    @Value("#{duplicateMessageStateExceptionMessage}")
+    private String errorMessage;
+
+    @Value("${statusError}")
+    Integer STATUS_ERROR;
+
     @Autowired
     public FinishGameController(ProfileService profileService) {
         this.profileService = profileService;
@@ -23,6 +32,13 @@ public class FinishGameController implements MessageController<FinishGameRequest
 
     @Override
     public Object onMessage(FinishGameRequest finishGameRequest, UserProfile userProfile) {
+
+        if(userProfile.getState() == ProfileState.MAIN_MENU){
+            FinishGameResponse response = profileService.takeActionsOnFinishGame(finishGameRequest, userProfile);
+            response.errorCode = STATUS_ERROR;
+            response.errorMessage = "errorMessage";
+        }
+        userProfile.setState(ProfileState.MAIN_MENU);
         return profileService.takeActionsOnFinishGame(finishGameRequest, userProfile);
     }
 
