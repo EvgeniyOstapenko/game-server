@@ -62,7 +62,7 @@ public class TopRequestTest extends ConnectAndLoginTests {
 
     @Test
     public void onMessageTestRequestToGetTopUserListShouldReturnTopUsersList2() {
-        successLoginTest();
+//        successLoginTest();
 
         //GIVEN
         FinishGameRequest finishGameRequest = new FinishGameRequest();
@@ -81,6 +81,5 @@ public class TopRequestTest extends ConnectAndLoginTests {
         //THEN
         assertSame(NUMBER_OF_PLAYERS, response.topList.size());
     }
-
 
 }

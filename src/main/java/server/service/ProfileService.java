@@ -84,6 +84,9 @@ public class ProfileService {
     @Value("${finalUserLevel}")
     Integer FINAL_USER_LEVEL;
 
+    @Value("#{duplicateMessageStateExceptionMessage}")
+    private String DUPLICATE_REQUEST_ERROR_MESSAGE;
+
     private Map<Integer, LocalDate> nameChangeDateMap = new HashMap<>();
 
     public UserProfile findUserProfileOrCreateNew(String uid) {
@@ -103,7 +106,6 @@ public class ProfileService {
     }
 
     public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, UserProfile user) {
-
         if(user.getState() == ProfileState.MAIN_MENU){
             return getDuplicateRequestErrorResponse();
         }
@@ -133,7 +135,7 @@ public class ProfileService {
     private FinishGameResponse getDuplicateRequestErrorResponse() {
         FinishGameResponse response = new FinishGameResponse();
         response.errorCode = STATUS_ERROR;
-        response.errorMessage = "errorMessage";
+        response.errorMessage = String.format(DUPLICATE_REQUEST_ERROR_MESSAGE, new FinishGameRequest());
 
         return response;
     }
