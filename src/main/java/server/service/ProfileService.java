@@ -103,6 +103,13 @@ public class ProfileService {
     }
 
     public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, UserProfile user) {
+
+        if(user.getState() == ProfileState.MAIN_MENU){
+            return getDuplicateRequestErrorResponse();
+        }
+
+        user.setState(ProfileState.MAIN_MENU);
+
         if (request.getResult().equals(GameResult.WIN)) {
             return takeWinningActions(user);
         }
@@ -121,6 +128,14 @@ public class ProfileService {
 
         user.setName(newUserName);
         return changeUserNameResponse;
+    }
+
+    private FinishGameResponse getDuplicateRequestErrorResponse() {
+        FinishGameResponse response = new FinishGameResponse();
+        response.errorCode = STATUS_ERROR;
+        response.errorMessage = "errorMessage";
+
+        return response;
     }
 
     private boolean isAllowedNameToBeChanged(UserProfile user) {

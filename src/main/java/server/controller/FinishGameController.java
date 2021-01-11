@@ -33,11 +33,6 @@ public class FinishGameController implements MessageController<FinishGameRequest
     @Override
     public Object onMessage(FinishGameRequest finishGameRequest, UserProfile userProfile) {
 
-        if(userProfile.getState() == ProfileState.MAIN_MENU){
-            FinishGameResponse response = profileService.takeActionsOnFinishGame(finishGameRequest, userProfile);
-            response.errorCode = STATUS_ERROR;
-            response.errorMessage = "errorMessage";
-        }
         userProfile.setState(ProfileState.MAIN_MENU);
         return profileService.takeActionsOnFinishGame(finishGameRequest, userProfile);
     }

@@ -98,8 +98,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         } else {
             var messageController = controllers.get(message.getClass());
             if (messageController != null) {
-//                var outMessage = getResponseMessage(message, messageController, channel);
-                messageController.onMessage(message, userProfile);
+                Object outMessage = messageController.onMessage(message, openConnections.get(channel).profile);
                 if (outMessage != null) {
                     this.pendingQueue.add(outMessage, new DefaultChannelPromise(ctx.channel()));
                 }
