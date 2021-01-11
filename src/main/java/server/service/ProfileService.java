@@ -60,6 +60,30 @@ public class ProfileService {
     @Value("${statusError}")
     Integer STATUS_ERROR;
 
+    @Value("${experienceReward}")
+    Integer EXPERIENCE_REWARD;
+
+    @Value("${moneyReward}")
+    Integer MONEY_REWARD;
+
+    @Value("${ratingReward}")
+    Integer RATING_REWARD;
+
+    @Value("${lossInExperience}")
+    Integer LOSS_IN_EXPERIENCE;
+
+    @Value("${lossInRating}")
+    Integer LOSS_IN_RATING;
+
+    @Value("${ratingThreshold}")
+    Integer RATING_THRESHOLD;
+
+    @Value("${one}")
+    Integer ONE;
+
+    @Value("${finalUserLevel}")
+    Integer FINAL_USER_LEVEL;
+
     private Map<Integer, LocalDate> nameChangeDateMap = new HashMap<>();
 
     public UserProfile findUserProfileOrCreateNew(String uid) {
@@ -117,14 +141,13 @@ public class ProfileService {
         return true;
     }
 
-
     private FinishGameResponse takeWinningActions(UserProfile user) {
-        user.setExperience(user.getExperience() + 10);
+        user.setExperience(user.getExperience() + EXPERIENCE_REWARD);
 
         UserProfile currentUser = recalculateUserLevel(user);
 
-        currentUser.setMoney(currentUser.getMoney() + 10);
-        currentUser.setRating(currentUser.getRating() + 3);
+        currentUser.setMoney(currentUser.getMoney() + MONEY_REWARD);
+        currentUser.setRating(currentUser.getRating() + RATING_REWARD);
 
         topRequestService.onRatingChange(currentUser);
         userProfileRegistry.updateUserProfile(currentUser);
@@ -135,14 +158,14 @@ public class ProfileService {
     }
 
     private FinishGameResponse takeLosingActions(UserProfile user) {
-        user.setExperience(user.getExperience() + 3);
+        user.setExperience(user.getExperience() + LOSS_IN_EXPERIENCE);
         UserProfile currentUser = recalculateUserLevel(user);
 
         currentUser.setState(ProfileState.MAIN_MENU);
         AwardStructure userAward = getUserAward(user);
 
-        if (currentUser.getRating() > 0) {
-            currentUser.setRating(currentUser.getRating() - 1);
+        if (currentUser.getRating() > RATING_THRESHOLD) {
+            currentUser.setRating(currentUser.getRating() - LOSS_IN_RATING);
             topRequestService.onRatingChange(currentUser);
         }
 
@@ -170,12 +193,17 @@ public class ProfileService {
     private UserProfile recalculateUserLevel(UserProfile user) {
         int userLevel = user.getLevel();
         int experience = user.getExperience();
+
+        if (userLevel == FINAL_USER_LEVEL) {
+            return user;
+        }
+
         int fullUserExperience = levelsConfig.get(userLevel) + experience;
 
         List<Map.Entry<Integer, Integer>> userLevels = levelsConfig.entrySet()
                 .stream().filter(level -> level.getValue() <= fullUserExperience).collect(Collectors.toList());
 
-        int achievedLevel = userLevels.get(userLevels.size() - 1).getKey();
+        int achievedLevel = userLevels.get(userLevels.size() - ONE).getKey();
 
         if (userLevel < achievedLevel) {
             getAwardForEachLevelReached(user, userLevel, achievedLevel);
@@ -190,7 +218,7 @@ public class ProfileService {
     }
 
     private void getAwardForEachLevelReached(UserProfile user, int oldLevel, int achievedLevel) {
-        IntStream.rangeClosed(oldLevel + 1, achievedLevel).forEach(i -> {
+        IntStream.rangeClosed(oldLevel + ONE, achievedLevel).forEach(i -> {
             var award = levelUpAwardConfig.get(i);
             user.setMoney(user.getMoney() + award.getMoney());
             user.setEnergy(user.getEnergy() + award.getEnergy());

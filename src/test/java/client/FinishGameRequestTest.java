@@ -117,4 +117,31 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
         //AFTER
         clientConnection.request(new StartGameRequest(), StartGameResponse.class);
     }
+
+
+    @Test
+    @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    public void onMessageTestForUserWithFinalLevelShouldReturnResponseWithTheSameFinalUserLevel() {
+        successLoginTest();
+
+        //GIVEN
+        FinishGameRequest victoryRequest = new FinishGameRequest();
+        victoryRequest.setResult(GameResult.WIN);
+
+        //WHEN
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+        FinishGameResponse response = clientConnection.request(victoryRequest, FinishGameResponse.class);
+
+        //THEN
+        assertSame(STATUS_OK, response.errorCode);
+        assertSame(20, response.award.getEnergy());
+
+        //AFTER
+        clientConnection.request(new StartGameRequest(), StartGameResponse.class);
+    }
 }

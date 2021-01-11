@@ -140,18 +140,6 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private void validateStartGameAndFinishGAmeRequests(Object message, ChannelHandlerContext ctx) {
-        try {
-            messageUtil.checkStartOrFinishDuplicateState(message);
-        } catch (DuplicateMessageStateException error) {
-            String errorMessage = error.getReason();
-            log.error(errorMessage, message.getClass());
-
-            Channel channel = ctx.channel();
-            channel.close();
-        }
-    }
-
     private Object getResponseMessage(Object message, MessageController messageController, Channel channel) {
         IUser profile = openConnections.get(channel).profile;
         IUser userProfile = userProfileRegistry.selectUserProfile(profile.id());
