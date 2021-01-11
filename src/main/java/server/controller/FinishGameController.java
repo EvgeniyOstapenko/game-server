@@ -1,14 +1,12 @@
 package server.controller;
 
 import common.messages.FinishGameRequest;
-import common.messages.FinishGameResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import platform.service.MessageController;
-import server.common.ProfileState;
 import server.domain.UserProfile;
 import server.service.ProfileService;
 
@@ -29,7 +27,7 @@ public class FinishGameController implements MessageController<FinishGameRequest
 
     @Override
     public Object onMessage(FinishGameRequest finishGameRequest, UserProfile userProfile) {
-        return profileService.takeActionsOnFinishGame(finishGameRequest, userProfile);
+        return profileService.getFinishGameResponse(finishGameRequest, userProfile);
     }
 
     @Override

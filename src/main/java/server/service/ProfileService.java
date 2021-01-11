@@ -105,11 +105,28 @@ public class ProfileService {
         return (UserProfile) userProfileRegistry.selectUserProfile(profileId);
     }
 
-    public StartGameResponse takeActionsOnStartGame(UserProfile user) {
-        return getStartGameResponse(user);
+    public StartGameResponse getStartGameResponse(StartGameRequest request, UserProfile user) {
+        if (user.getState() == ProfileState.IN_GAME) {
+            return (StartGameResponse) getDuplicateRequestErrorResponse(request);
+        }
+
+        var startGameResponse = new StartGameResponse();
+
+        if (user.getEnergy() >= ENERGY_GAME_PRICE) {
+            user.setEnergy(user.getEnergy() - ENERGY_GAME_PRICE);
+            userProfileRegistry.updateUserProfile(user);
+
+            user.setState(ProfileState.IN_GAME);
+            return startGameResponse;
+        }
+
+        startGameResponse.errorCode = STATUS_ERROR;
+        startGameResponse.errorMessage = ENERGY_ERROR_MESSAGE;
+
+        return startGameResponse;
     }
 
-    public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, UserProfile user) {
+    public FinishGameResponse getFinishGameResponse(FinishGameRequest request, UserProfile user) {
         if (user.getState() == ProfileState.MAIN_MENU) {
             return (FinishGameResponse) getDuplicateRequestErrorResponse(request);
         }
@@ -122,7 +139,7 @@ public class ProfileService {
         return takeLosingActions(user);
     }
 
-    public ChangeUserNameResponse changeUserName(UserProfile user, String newUserName) {
+    public ChangeUserNameResponse getChangeUserNameResponse(UserProfile user, String newUserName) {
         boolean allowedNameToBeChanged = isAllowedNameToBeChanged(user);
 
         ChangeUserNameResponse changeUserNameResponse = new ChangeUserNameResponse();
@@ -193,23 +210,6 @@ public class ProfileService {
 
         userProfileRegistry.updateUserProfile(currentUser);
         return new FinishGameResponse(userAward);
-    }
-
-    private StartGameResponse getStartGameResponse(UserProfile user) {
-        var startGameResponse = new StartGameResponse();
-
-        if (user.getEnergy() >= ENERGY_GAME_PRICE) {
-            user.setEnergy(user.getEnergy() - ENERGY_GAME_PRICE);
-            userProfileRegistry.updateUserProfile(user);
-
-            user.setState(ProfileState.IN_GAME);
-            return startGameResponse;
-        }
-
-        startGameResponse.errorCode = STATUS_ERROR;
-        startGameResponse.errorMessage = ENERGY_ERROR_MESSAGE;
-
-        return startGameResponse;
     }
 
     private UserProfile recalculateUserLevel(UserProfile user) {
