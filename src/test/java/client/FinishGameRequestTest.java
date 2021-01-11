@@ -59,7 +59,7 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
 
     @Test
     public void onMessageTestWithDuplicateStartInTheRowGameRequestShouldReturnErrorResponse() {
-//        successLoginTest();
+        successLoginTest();
 
         //GIVEN
         FinishGameRequest defeatGameFinishRequest = new FinishGameRequest();

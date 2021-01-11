@@ -1,10 +1,7 @@
 package server.service;
 
 import common.dto.AwardStructure;
-import common.messages.ChangeUserNameResponse;
-import common.messages.FinishGameRequest;
-import common.messages.FinishGameResponse;
-import common.messages.StartGameResponse;
+import common.messages.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,45 +46,52 @@ public class ProfileService {
     private Map<Integer, AwardStructure> levelUpAwardConfig;
 
     @Value("#{costOfGame}")
-    Integer ENERGY_GAME_PRICE;
+    private Integer ENERGY_GAME_PRICE;
 
     @Value("${energyErrorMessage}")
-    String ENERGY_ERROR_MESSAGE;
+    private String ENERGY_ERROR_MESSAGE;
 
     @Value("${changeNameErrorMassage}")
-    String CHANGE_NAME_ERROR_MESSAGE;
+    private String CHANGE_NAME_ERROR_MESSAGE;
 
     @Value("${statusError}")
-    Integer STATUS_ERROR;
+    private Integer STATUS_ERROR;
 
     @Value("${experienceReward}")
-    Integer EXPERIENCE_REWARD;
+    private Integer EXPERIENCE_REWARD;
 
     @Value("${moneyReward}")
-    Integer MONEY_REWARD;
+    private Integer MONEY_REWARD;
 
     @Value("${ratingReward}")
-    Integer RATING_REWARD;
+    private Integer RATING_REWARD;
 
     @Value("${lossInExperience}")
-    Integer LOSS_IN_EXPERIENCE;
+    private Integer LOSS_IN_EXPERIENCE;
 
     @Value("${lossInRating}")
-    Integer LOSS_IN_RATING;
+    private Integer LOSS_IN_RATING;
 
     @Value("${ratingThreshold}")
-    Integer RATING_THRESHOLD;
+    private Integer RATING_THRESHOLD;
 
     @Value("${one}")
-    Integer ONE;
+    private Integer ONE;
 
     @Value("${finalUserLevel}")
-    Integer FINAL_USER_LEVEL;
+    private Integer FINAL_USER_LEVEL;
 
     @Value("#{duplicateMessageStateExceptionMessage}")
     private String DUPLICATE_REQUEST_ERROR_MESSAGE;
 
+    private Map<String, AbstractResponse> responseMap = new HashMap<>();
+
     private Map<Integer, LocalDate> nameChangeDateMap = new HashMap<>();
+
+    ProfileService() {
+        responseMap.put(new StartGameRequest().toString(), new StartGameResponse());
+        responseMap.put(new FinishGameRequest().toString(), new FinishGameResponse());
+    }
 
     public UserProfile findUserProfileOrCreateNew(String uid) {
         var profile = userProfileRegistry.findUserProfileByUid(uid);
@@ -106,8 +110,8 @@ public class ProfileService {
     }
 
     public FinishGameResponse takeActionsOnFinishGame(FinishGameRequest request, UserProfile user) {
-        if(user.getState() == ProfileState.MAIN_MENU){
-            return getDuplicateRequestErrorResponse();
+        if (user.getState() == ProfileState.MAIN_MENU) {
+            return (FinishGameResponse) getDuplicateRequestErrorResponse(request);
         }
 
         user.setState(ProfileState.MAIN_MENU);
@@ -132,10 +136,11 @@ public class ProfileService {
         return changeUserNameResponse;
     }
 
-    private FinishGameResponse getDuplicateRequestErrorResponse() {
-        FinishGameResponse response = new FinishGameResponse();
+    private AbstractResponse getDuplicateRequestErrorResponse(Object request) {
+        AbstractResponse response = responseMap.get(request.toString());
+
         response.errorCode = STATUS_ERROR;
-        response.errorMessage = String.format(DUPLICATE_REQUEST_ERROR_MESSAGE, new FinishGameRequest());
+        response.errorMessage = String.format(DUPLICATE_REQUEST_ERROR_MESSAGE, request);
 
         return response;
     }
