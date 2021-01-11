@@ -1,6 +1,5 @@
 package platform.connection;
 
-import common.exception.DuplicateMessageStateException;
 import common.messages.AbstractResponse;
 import common.util.KeyValue;
 import common.util.MessageUtil;
