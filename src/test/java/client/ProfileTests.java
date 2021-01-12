@@ -123,7 +123,7 @@ public class ProfileTests extends ConnectAndLoginTests {
     @Test
     @Sql(value = {"/prepare-user_profile.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void recalculateUserLevelAndExperienceWithAwardTestShouldChangeUserExperienceLevelAndAward() {
-//        successLoginTest();
+        successLoginTest();
         //GIVEN
         FinishGameRequest finishGameRequest = new FinishGameRequest();
         finishGameRequest.setResult(GameResult.WIN);
@@ -131,6 +131,7 @@ public class ProfileTests extends ConnectAndLoginTests {
         //WHEN
         when((messageUtil).isRequestDuplicate(finishGameRequest)).thenReturn(false);
         IntStream.rangeClosed(1, 6).forEach(i -> {
+            clientConnection.request(new StartGameRequest(), StartGameResponse.class);
             var startGameResponse = clientConnection.request(finishGameRequest, FinishGameResponse.class);
         });
 
@@ -139,7 +140,7 @@ public class ProfileTests extends ConnectAndLoginTests {
         profile = profileService.selectUserProfile(TEST_PROFILE_ID);
         assertEquals(4, profile.getLevel());
         assertEquals(10, profile.getExperience());
-        assertEquals(325, profile.getEnergy());
+        assertEquals(295, profile.getEnergy());
         assertEquals(18, profile.getRating());
         assertEquals(460, profile.getMoney());
     }
