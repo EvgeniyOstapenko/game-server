@@ -1,18 +1,18 @@
 package platform.connection;
 
+import platform.messages.ILogin;
 import common.util.KeyValue;
-import common.util.MessageUtil;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import platform.messages.ILogin;
 import platform.service.AuthService;
 import platform.service.LoginController;
 import platform.service.MessageController;
-import platform.service.UserProfileRegistry;
 import platform.session.Session;
 import platform.session.SessionMap;
 
@@ -23,18 +23,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-
 @Service
 @ChannelHandler.Sharable
 public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
-    MessageUtil messageUtil;
-
-    @Autowired
-    UserProfileRegistry userProfileRegistry;
 
     @Resource
     private AuthService authService;
@@ -45,27 +38,13 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
     @Resource
     private SessionMap sessionMap;
 
-    @Value("${statusError}")
-    Integer STATUS_ERROR;
-
-    @Value("${freeQueueSlots}")
-    private int FREE_QUEUE_SLOTS = 100;
-
     private Map<Channel, Session> openConnections = new ConcurrentHashMap<>();
 
     private Map<Class, MessageController> controllers = Collections.emptyMap();
 
-    private PendingWriteQueue pendingQueue;
-
-
     @Autowired(required = false)
     private void setControllers(List<MessageController> controllers) {
         this.controllers = controllers.stream().collect(Collectors.toMap(MessageController::messageClass, c -> c));
-    }
-
-    @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        this.pendingQueue = new PendingWriteQueue(ctx);
     }
 
     @Override
@@ -78,7 +57,6 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, final Object message) throws Exception {
-
         var channel = ctx.channel();
         if (message instanceof ILogin) {
             var error = new KeyValue<Integer, String>();
@@ -86,25 +64,22 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
             if (session != null) {
                 openConnections.put(channel, session);
                 var outMessages = loginController.onSuccessLogin(session.profile);
-                for (Object m : outMessages) {
-                    this.pendingQueue.add(m, new DefaultChannelPromise(ctx.channel()));
-                }
-
+                outMessages.forEach(channel::write);
+                channel.flush();
             } else {
-                this.pendingQueue.add(loginController.onLoginError((ILogin) message, error), new DefaultChannelPromise(ctx.channel()));
+                channel.writeAndFlush(loginController.onLoginError((ILogin) message, error));
             }
         } else {
             var messageController = controllers.get(message.getClass());
             if (messageController != null) {
-                Object outMessage = messageController.onMessage(message, openConnections.get(channel).profile);
+                var outMessage = messageController.onMessage(message, openConnections.get(channel).profile);
                 if (outMessage != null) {
-                    this.pendingQueue.add(outMessage, new DefaultChannelPromise(ctx.channel()));
+                    channel.writeAndFlush(outMessage);
                 }
             } else {
                 log.error("Controller for message of class [{}] not found!", message.getClass());
             }
         }
-        sendMessagesThroughQueue(ctx);
     }
 
     @Override
@@ -122,18 +97,6 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         var session = openConnections.remove(ctx.channel());
         if (session != null && session.profile != null) {
             sessionMap.closeSession(session.profile.id());
-        }
-    }
-
-    private synchronized void sendMessagesThroughQueue(ChannelHandlerContext ctx) {
-        if (this.FREE_QUEUE_SLOTS > 0) {
-            while (this.FREE_QUEUE_SLOTS > 0) {
-                if (this.pendingQueue.removeAndWrite() == null) {
-                    ctx.flush();
-                    return;
-                }
-                this.FREE_QUEUE_SLOTS--;
-            }
         }
     }
 
