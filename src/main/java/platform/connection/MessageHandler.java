@@ -1,6 +1,5 @@
 package platform.connection;
 
-import common.messages.AbstractResponse;
 import common.util.KeyValue;
 import common.util.MessageUtil;
 import io.netty.channel.*;
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import platform.domain.IUser;
 import platform.messages.ILogin;
 import platform.service.AuthService;
 import platform.service.LoginController;
@@ -139,29 +137,4 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-    private Object getResponseMessage(Object message, MessageController messageController, Channel channel) {
-        IUser profile = openConnections.get(channel).profile;
-        IUser userProfile = userProfileRegistry.selectUserProfile(profile.id());
-
-        if (!messageUtil.isRequestDuplicate(message)) {
-            return messageController.onMessage(message, userProfile);
-        }
-
-        String errorMessage = toLogException(message);
-
-        var response = messageController.onMessage(message, userProfile);
-        AbstractResponse errorResponse = (AbstractResponse) response;
-        errorResponse.errorCode = STATUS_ERROR;
-        errorResponse.errorMessage = errorMessage;
-
-        return response;
-    }
-
-    private String toLogException(Object message) {
-        messageUtil.setRequest(message);
-        var errorMessage = messageUtil.getStartOrFinishDuplicateStateErrorMessage();
-        log.error(errorMessage, message.getClass());
-
-        return errorMessage;
-    }
 }
